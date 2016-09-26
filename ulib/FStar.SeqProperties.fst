@@ -33,9 +33,9 @@ let lemma_append_inj_r #a s1 s2 t1 t2 i =
   assert (index s2 i == (index (append s1 s2) (i + length s1)));
   assert (index t2 i == (index (append t1 t2) (i + length t1)))
 
-val lemma_append_len_disj: #a:Type -> s1:seq a -> s2:seq a -> t1:seq a -> t2:seq a {(length s1 = length t1 \/ length s2 = length t2) /\ (equal (append s1 s2) (append t1 t2))}
+val lemma_append_length_disj: #a:Type -> s1:seq a -> s2:seq a -> t1:seq a -> t2:seq a {(length s1 = length t1 \/ length s2 = length t2) /\ (equal (append s1 s2) (append t1 t2))}
   -> Lemma (ensures (length s1 = length t1 /\ length s2 = length t2))
-let lemma_append_len_disj #a s1 s2 t1 t2 =
+let lemma_append_length_disj #a s1 s2 t1 t2 =
   cut (length (append s1 s2) == length s1 + length s2);
   cut (length (append t1 t2) == length t1 + length t2)
 
@@ -43,7 +43,7 @@ val lemma_append_inj: #a:Type -> s1:seq a -> s2:seq a -> t1:seq a -> t2:seq a {l
   -> Lemma (requires (equal (append s1 s2) (append t1 t2)))
            (ensures (equal s1 t1 /\ equal s2 t2))
 let lemma_append_inj #a s1 s2 t1 t2 =
-  lemma_append_len_disj s1 s2 t1 t2;
+  lemma_append_length_disj s1 s2 t1 t2;
   FStar.Classical.forall_intro #(i:nat{i < length s1}) #(fun i -> index s1 i == index t1 i) (lemma_append_inj_l s1 s2 t1 t2);
   FStar.Classical.forall_intro #(i:nat{i < length s2}) #(fun i -> index s2 i == index t2 i) (lemma_append_inj_r s1 s2 t1 t2)
 
@@ -59,9 +59,9 @@ let cons #a x s = append (create 1 x) s
 val split: #a:Type -> s:seq a -> i:nat{(0 <= i /\ i <= length s)} -> Tot (seq a * seq a)
 let split #a s i = slice s 0 i, slice s i (length s)
 
-val lemma_split : #a:Type -> s:seq a -> i:nat{(0 <= i /\ i <= length s)} -> Lemma
+val lemma_split_charac : #a:Type -> s:seq a -> i:nat{(0 <= i /\ i <= length s)} -> Lemma
   (ensures (append (fst (split s i)) (snd (split s i)) == s))
-let lemma_split #a s i =
+let lemma_split_charac #a s i =
   cut (equal (append (fst (split s i)) (snd (split s i)))  s)
 
 val split_eq: #a:Type -> s:seq a -> i:nat{(0 <= i /\ i <= length s)} -> Pure
@@ -70,7 +70,7 @@ val split_eq: #a:Type -> s:seq a -> i:nat{(0 <= i /\ i <= length s)} -> Pure
   (ensures (fun x -> (append (fst x) (snd x) == s)))
 let split_eq #a s i =
   let x = split s i in
-  lemma_split s i;
+  lemma_split_charac s i;
   x
 
 val count : #a:eqtype -> a -> s:seq a -> Tot nat (decreases (length s))
@@ -86,18 +86,21 @@ let mem #a x l = count x l > 0
 val swap: #a:Type -> s:seq a -> i:nat{i<length s} -> j:nat{j<length s} -> Tot (seq a)
 let swap #a s i j = upd (upd s j (index s i)) i (index s j)
 
-val lemma_slice_append: #a:Type -> s1:seq a{length s1 >= 1} -> s2:seq a -> Lemma
+(* TR: slice_append -> append_slice *)
+val lemma_append_slice: #a:Type -> s1:seq a{length s1 >= 1} -> s2:seq a -> Lemma
   (ensures (equal (append s1 s2) (append (slice s1 0 1) (append (slice s1 1 (length s1)) s2))))
-let lemma_slice_append #a s1 s2 = ()
+let lemma_append_slice #a s1 s2 = ()
 
-val lemma_append_cons: #a:Type -> s1:seq a{length s1 > 0} -> s2:seq a -> Lemma
+val lemma_append_cons_head_tail: #a:Type -> s1:seq a{length s1 > 0} -> s2:seq a -> Lemma
   (requires True)
   (ensures (equal (append s1 s2) (cons (head s1) (append (tail s1) s2))))
-let rec lemma_append_cons #a s1 s2 = ()
+let rec lemma_append_cons_head_tail #a s1 s2 = ()
 
-val lemma_tl: #a:Type -> hd:a -> tl:seq a -> Lemma
+(* TR: lemma_tl -> lemma_tail_cons *)
+
+val lemma_tail_cons: #a:Type -> hd:a -> tl:seq a -> Lemma
   (ensures (equal (tail (cons hd tl)) tl))
-let lemma_tl #a hd tl = ()
+let lemma_tail_cons #a hd tl = ()
 
 val sorted: #a:Type
           -> (a -> a -> Tot bool)
@@ -109,25 +112,30 @@ let rec sorted #a f s =
   else let hd = head s in
        f hd (index s 1) && sorted f (tail s)
 
+(* TR: lemma_append_count -> lemma_count_append *)
+
 #set-options "--max_fuel 1 --initial_fuel 1"
-val lemma_append_count: #a:eqtype -> lo:seq a -> hi:seq a -> Lemma
+val lemma_count_append: #a:eqtype -> lo:seq a -> hi:seq a -> Lemma
   (requires True)
   (ensures (forall x. count x (append lo hi) = (count x lo + count x hi)))
   (decreases (length lo))
-let rec lemma_append_count #a lo hi =
+let rec lemma_count_append #a lo hi =
   if length lo = 0
   then cut (equal (append lo hi) hi)
   else (cut (equal (cons (head lo) (append (tail lo) hi))
                 (append lo hi));
-        lemma_append_count (tail lo) hi;
+        lemma_count_append (tail lo) hi;
         let tl_l_h = append (tail lo) hi in
         let lh = cons (head lo) tl_l_h in
         cut (equal (tail lh) tl_l_h))
 
-val lemma_append_count_aux: #a:eqtype -> x:a -> lo:seq a -> hi:seq a -> Lemma
+(* TR: what is the purpose of the following _aux lemma? Should we swap
+them and make the _aux version private? *)
+
+val lemma_count_append_aux: #a:eqtype -> x:a -> lo:seq a -> hi:seq a -> Lemma
   (requires True)
   (ensures (count x (append lo hi) = (count x lo + count x hi)))
-let lemma_append_count_aux #a x lo hi = lemma_append_count lo hi
+let lemma_count_append_aux #a x lo hi = lemma_count_append lo hi
 
 val lemma_mem_inversion: #a:eqtype -> s:seq a{length s > 0} -> Lemma
   (ensures (forall x. mem x s = (x=head s || mem x (tail s))))
@@ -150,7 +158,7 @@ val lemma_count_slice: #a:eqtype -> s:seq a -> i:nat{i<=length s} -> Lemma
   (decreases (length s))
 let lemma_count_slice #a s i =
   cut (equal s (append (slice s 0 i) (slice s i (length s))));
-  lemma_append_count (slice s 0 i) (slice s i (length s))
+  lemma_count_append (slice s 0 i) (slice s i (length s))
 
 type total_order (a:eqtype) (f: (a -> a -> Tot bool)) =
     (forall a. f a a)                                           (* reflexivity   *)
@@ -158,7 +166,7 @@ type total_order (a:eqtype) (f: (a -> a -> Tot bool)) =
     /\ (forall a1 a2 a3. f a1 a2 /\ f a2 a3 ==> f a1 a3)        (* transitivity  *)
 type tot_ord (a:eqtype) = f:(a -> a -> Tot bool){total_order a f}
 
-val sorted_concat_lemma: #a:eqtype
+val lemma_sorted_append_cons: #a:eqtype
                       -> f:(a -> a -> Tot bool){total_order a f}
                       -> lo:seq a{sorted f lo}
                       -> pivot:a
@@ -167,13 +175,13 @@ val sorted_concat_lemma: #a:eqtype
                                                  /\ (mem y hi ==> f pivot y)))
                                (ensures (sorted f (append lo (cons pivot hi))))
                                (decreases (length lo))
-let rec sorted_concat_lemma #a f lo pivot hi =
+let rec lemma_sorted_append_cons #a f lo pivot hi =
   if length lo = 0
   then (cut (equal (append lo (cons pivot hi)) (cons pivot hi));
         cut (equal (tail (cons pivot hi)) hi))
-  else (sorted_concat_lemma f (tail lo) pivot hi;
-        lemma_append_cons lo (cons pivot hi);
-        lemma_tl (head lo) (append (tail lo) (cons pivot hi)))
+  else (lemma_sorted_append_cons f (tail lo) pivot hi;
+        lemma_append_cons_head_tail lo (cons pivot hi);
+        lemma_tail_cons (head lo) (append (tail lo) (cons pivot hi)))
 
 #set-options "--max_fuel 1 --initial_fuel 1"
 val split_5 : #a:Type -> s:seq a -> i:nat -> j:nat{i < j && j < length s} -> Pure (seq (seq a))
@@ -220,10 +228,10 @@ let lemma_swap_permutes_aux #a s i j x =
       let s5 = split_5 s i j in
       let frag_lo, frag_i, frag_mid, frag_j, frag_hi =
         index s5 0, index s5 1, index s5 2, index s5 3, index s5 4 in
-      lemma_append_count_aux x frag_lo (append frag_i (append frag_mid (append frag_j frag_hi)));
-      lemma_append_count_aux x frag_i (append frag_mid (append frag_j frag_hi));
-      lemma_append_count_aux x frag_mid (append frag_j frag_hi);
-      lemma_append_count_aux x frag_j frag_hi;
+      lemma_count_append_aux x frag_lo (append frag_i (append frag_mid (append frag_j frag_hi)));
+      lemma_count_append_aux x frag_i (append frag_mid (append frag_j frag_hi));
+      lemma_count_append_aux x frag_mid (append frag_j frag_hi);
+      lemma_count_append_aux x frag_j frag_hi;
 
       let s' = swap s i j in
       let s5' = split_5 s' i j in
@@ -234,10 +242,10 @@ let lemma_swap_permutes_aux #a s i j x =
       lemma_swap_permutes_aux_frag_eq s i j (i + 1) j;
       lemma_swap_permutes_aux_frag_eq s i j (j + 1) (length s);
 
-      lemma_append_count_aux x frag_lo (append frag_j (append frag_mid (append frag_i frag_hi)));
-      lemma_append_count_aux x frag_j (append frag_mid (append frag_i frag_hi));
-      lemma_append_count_aux x frag_mid (append frag_i frag_hi);
-      lemma_append_count_aux x frag_i frag_hi
+      lemma_count_append_aux x frag_lo (append frag_j (append frag_mid (append frag_i frag_hi)));
+      lemma_count_append_aux x frag_j (append frag_mid (append frag_i frag_hi));
+      lemma_count_append_aux x frag_mid (append frag_i frag_hi);
+      lemma_count_append_aux x frag_i frag_hi
   end
 
 #set-options "--max_fuel 0 --initial_fuel 0"
@@ -252,22 +260,22 @@ let lemma_swap_permutes #a s i j = FStar.Classical.forall_intro #a #(fun x -> co
 val cons_perm: #a:eqtype -> tl:seq a -> s:seq a{length s > 0} ->
          Lemma (requires (permutation a tl (tail s)))
                (ensures (permutation a (cons (head s) tl) s))
-let cons_perm #a tl s = lemma_tl (head s) tl
+let cons_perm #a tl s = lemma_tail_cons (head s) tl
 
 #set-options "--max_fuel 2 --initial_fuel 2"
 val lemma_mem_append : #a:eqtype -> s1:seq a -> s2:seq a
       -> Lemma (ensures (forall x. mem x (append s1 s2) <==> (mem x s1 || mem x s2)))
-let lemma_mem_append #a s1 s2 = lemma_append_count s1 s2
+let lemma_mem_append #a s1 s2 = lemma_count_append s1 s2
 
-val lemma_slice_cons: #a:eqtype -> s:seq a -> i:nat -> j:nat{i < j && j <= length s}
+val lemma_mem_slice_cons: #a:eqtype -> s:seq a -> i:nat -> j:nat{i < j && j <= length s}
   -> Lemma (ensures (forall x. mem x (slice s i j) <==> (x = index s i || mem x (slice s (i + 1) j))))
-let lemma_slice_cons #a s i j =
+let lemma_mem_slice_cons #a s i j =
   cut (equal (slice s i j) (append (create 1 (index s i)) (slice s (i + 1) j)));
   lemma_mem_append (create 1 (index s i)) (slice s (i + 1) j)
 
-val lemma_slice_snoc: #a:eqtype -> s:seq a -> i:nat -> j:nat{i < j && j <= length s}
+val lemma_mem_slice_snoc: #a:eqtype -> s:seq a -> i:nat -> j:nat{i < j && j <= length s}
   -> Lemma (ensures (forall x. mem x (slice s i j) <==> (x = index s (j - 1) || mem x (slice s i (j - 1)))))
-let lemma_slice_snoc #a s i j =
+let lemma_mem_slice_snoc #a s i j =
   cut (equal (slice s i j) (append (slice s i (j - 1)) (create 1 (index s (j - 1)))));
   lemma_mem_append (slice s i (j - 1)) (create 1 (index s (j - 1)))
 
@@ -370,8 +378,8 @@ let lemma_weaken_perm_left #a s1 s2 i j k =
                                  (slice s2 j k)));
   cut (equal (slice s1 i k) (append (slice s2 i j)
                                  (slice s1 j k)));
-  lemma_append_count (slice s2 i j) (slice s2 j k);
-  lemma_append_count (slice s2 i j) (slice s1 j k)
+  lemma_count_append (slice s2 i j) (slice s2 j k);
+  lemma_count_append (slice s2 i j) (slice s1 j k)
 
 val lemma_weaken_perm_right: #a:eqtype -> s1:seq a -> s2:seq a{length s1 = length s2} -> i:nat -> j:nat -> k:nat{i <= j /\ j <= k /\ k <= length s1}
   -> Lemma
@@ -382,8 +390,8 @@ let lemma_weaken_perm_right #a s1 s2 i j k =
                                  (slice s2 j k)));
   cut (equal (slice s1 i k) (append (slice s1 i j)
                                  (slice s2 j k)));
-  lemma_append_count (slice s2 i j) (slice s2 j k);
-  lemma_append_count (slice s1 i j) (slice s2 j k)
+  lemma_count_append (slice s2 i j) (slice s2 j k);
+  lemma_count_append (slice s1 i j) (slice s2 j k)
 
 val lemma_trans_perm: #a:eqtype -> s1:seq a -> s2:seq a -> s3:seq a{length s1 = length s2 /\ length s2 = length s3} -> i:nat -> j:nat{i<=j && j <= length s1}
  -> Lemma
@@ -401,7 +409,7 @@ let snoc #a s x = Seq.append s (Seq.create 1 x)
 #set-options "--initial_fuel 2 --max_fuel 2"
 val lemma_mem_snoc : #a:eqtype -> s:FStar.Seq.seq a -> x:a ->
    Lemma (ensures (forall y. mem y (snoc s x) <==> mem y s \/ x=y))
-let lemma_mem_snoc #a s x = lemma_append_count s (Seq.create 1 x)
+let lemma_mem_snoc #a s x = lemma_count_append s (Seq.create 1 x)
 
 #set-options "--initial_ifuel 1 --max_ifuel 1 --initial_fuel 0 --max_fuel 0"
 type found (i:nat) = True
@@ -458,7 +466,7 @@ let rec seq_to_list #a s =
 val seq_of_list: #a:Type -> l:list a -> Tot (s:seq a{L.length l = length s})
 let rec seq_of_list #a l =
   match l with
-  | [] -> createEmpty #a
+  | [] -> empty #a
   | hd::tl -> create 1 hd @| seq_of_list tl
 
 val lemma_seq_list_bij: #a:Type -> s:seq a -> Lemma
@@ -467,11 +475,11 @@ val lemma_seq_list_bij: #a:Type -> s:seq a -> Lemma
   (decreases (length s))
 let rec lemma_seq_list_bij #a s =
   if length s = 0 then (
-    Seq.lemma_eq_intro s (seq_of_list (seq_to_list s))
+    Seq.eq_intro s (seq_of_list (seq_to_list s))
   )
   else (
     lemma_seq_list_bij (slice s 1 (length s));
-    lemma_eq_intro s (seq_of_list (seq_to_list s))
+    eq_intro s (seq_of_list (seq_to_list s))
   )
 
 val lemma_index_is_nth: #a:Type -> s:seq a -> i:nat{i < length s} -> Lemma

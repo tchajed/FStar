@@ -64,14 +64,14 @@ let rec read_word_ b s i =
   let h = HST.get() in
   if U32 (i =^ 16ul) then
     begin
-    Seq.lemma_eq_intro s (sel_word h b);
+    Seq.eq_intro s (sel_word h b);
     s
     end
   else
     begin
     let x = b.(i) in
     let s' = FStar.Seq (s @| Seq.create 1 x) in
-    Seq.lemma_eq_intro s' (Seq.slice (sel_word h b) 0 (U32.v i + 1));
+    Seq.eq_intro s' (Seq.slice (sel_word h b) 0 (U32.v i + 1));
     read_word_ b s' (U32 (i +^ 1ul))
     end
 
@@ -80,8 +80,8 @@ val read_word: b:wordB_16 -> ST word_16
   (ensures (fun h0 r h1 -> h0 == h1 /\ live h1 b /\ r == (sel_word h1 b)))
 let read_word b =
   let h = HST.get() in
-  let s0 = Seq.createEmpty #byte in
-  Seq.lemma_eq_intro s0 (Seq.slice (sel_word h b) 0 0);
+  let s0 = Seq.empty #byte in
+  Seq.eq_intro s0 (Seq.slice (sel_word h b) 0 0);
   read_word_ b s0 0ul
 
 (* From the current memory state, returns the field element corresponding to a elemB *)
@@ -139,9 +139,9 @@ val lemma_elemB_equality: ha:mem -> hb:mem -> a:elemB -> b:elemB -> len:pos{len<
     /\ get ha a (len-1) = get hb b (len-1)))
   (ensures  (live ha a /\ live hb b /\ Seq.slice (as_seq ha a) 0 len == Seq.slice (as_seq hb b) 0 len))
 let lemma_elemB_equality ha hb a b len =
-  Seq.lemma_eq_intro (Seq.slice (as_seq ha a) 0 len)
+  Seq.eq_intro (Seq.slice (as_seq ha a) 0 len)
 		     ((Seq.slice (as_seq ha a) 0 (len-1)) @| Seq.create 1 (get ha a (len-1)));
-  Seq.lemma_eq_intro (Seq.slice (as_seq hb b) 0 len)
+  Seq.eq_intro (Seq.slice (as_seq hb b) 0 len)
 		     ((Seq.slice (as_seq hb b) 0 (len-1)) @| Seq.create 1 (get hb b (len-1)))
 
 val lemma_toField_is_injective_0: ha:mem -> hb:mem -> a:elemB -> b:elemB -> len:nat{len <= norm_length} -> Lemma
@@ -151,7 +151,7 @@ val lemma_toField_is_injective_0: ha:mem -> hb:mem -> a:elemB -> b:elemB -> len:
     /\ Seq.slice (as_seq ha a) 0 len == Seq.slice (as_seq hb b) 0 len))
 let rec lemma_toField_is_injective_0 ha hb a b len =
   if len = 0 then
-    Seq.lemma_eq_intro (Seq.slice (as_seq ha a) 0 len) (Seq.slice (as_seq hb b) 0 len)
+    Seq.eq_intro (Seq.slice (as_seq ha a) 0 len) (Seq.slice (as_seq hb b) 0 len)
   else
     begin
     eval_def ha a len; eval_def hb b len;
@@ -178,8 +178,8 @@ let lemma_toField_is_injective ha hb a b =
   lemma_toField_is_injective_0 ha hb a b norm_length;
   assert(Seq.length (as_seq ha a) = norm_length);
   assert(Seq.length (as_seq hb b) = norm_length);
-  Seq.lemma_eq_intro (Seq.slice (as_seq ha a) 0 norm_length) (as_seq ha a);
-  Seq.lemma_eq_intro (Seq.slice (as_seq hb b) 0 norm_length) (as_seq hb b)
+  Seq.eq_intro (Seq.slice (as_seq ha a) 0 norm_length) (as_seq ha a);
+  Seq.eq_intro (Seq.slice (as_seq hb b) 0 norm_length) (as_seq hb b)
 
 
 (*** Poly1305 Field Operations ***)
@@ -605,8 +605,8 @@ val seq_head_snoc: #a:Type -> xs:Seq.seq a -> x:a ->
   Lemma (Seq.length (SeqProperties.snoc xs x) > 0 /\
          seq_head (SeqProperties.snoc xs x) == xs)
 let seq_head_snoc #a xs x =
-  Seq.lemma_len_append xs (Seq.create 1 x);
-  Seq.lemma_eq_intro (seq_head (SeqProperties.snoc xs x)) xs
+  Seq.length_append xs (Seq.create 1 x);
+  Seq.eq_intro (seq_head (SeqProperties.snoc xs x)) xs
 
 #reset-options
 
@@ -653,7 +653,7 @@ let poly1305_update log msgB acc r =
       let msg = read_word msgB in
       assert (encode_16 msg == sel_elem h1 block);
       seq_head_snoc (ilog log) (encode_16 msg);
-      Seq.lemma_index_app2 (ilog log) (Seq.create 1 (encode_16 msg)) (Seq.length (SeqProperties.snoc (ilog log) (encode_16 msg)) - 1);
+      Seq.index_append_right (ilog log) (Seq.create 1 (encode_16 msg)) (Seq.length (SeqProperties.snoc (ilog log) (encode_16 msg)) - 1);
       SeqProperties.snoc (ilog log) (encode_16 msg)
       end
     else () in
@@ -672,7 +672,7 @@ val append_as_seq_sub: h:mem -> n:UInt32.t -> m:UInt32.t -> msg:bytes{live h msg
  	  (as_seq h (Buffer.sub (Buffer.offset msg m) 0ul (n -| m))) ==
    as_seq h (Buffer.sub msg 0ul n))
 let append_as_seq_sub h n m msg =
-  Seq.lemma_eq_intro
+  Seq.eq_intro
     (append (as_seq h (Buffer.sub msg 0ul m))
    	    (as_seq h (Buffer.sub (Buffer.offset msg m) 0ul (n -| m))))
      (as_seq h (Buffer.sub msg 0ul n))
@@ -833,7 +833,7 @@ let poly1305_mac tag msg len key =
   let ctr = U32.div len 16ul in
   let rest = U32.rem len 16ul in
   (* Run the poly1305_update function ctr times *)
-  let l:log_t = if ideal then Seq.createEmpty #text else () in
+  let l:log_t = if ideal then Seq.empty #text else () in
   let l = poly1305_loop l msg acc r ctr in
   (* Run the poly1305_update function one more time on the incomplete block *)
   let last_block = sub msg (FStar.UInt32 (ctr *^ 16ul)) rest in

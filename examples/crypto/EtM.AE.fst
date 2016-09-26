@@ -54,7 +54,7 @@ let genPost parent h0 (k:key) h1 =
   /\ fresh_region k.region h0 h1
   /\ Map.contains h1 k.region
   /\ m_contains k.log h1
-  /\ m_sel h1 k.log == createEmpty
+  /\ m_sel h1 k.log == empty
   /\ invariant h1 k
 
 val keygen: parent:rid -> ST key
@@ -65,7 +65,7 @@ let keygen parent =
   let region = new_region parent in
   let ke = CPA.keygen region in
   let ka = MAC.keygen region in
-  let log = alloc_mref_seq region createEmpty in
+  let log = alloc_mref_seq region empty in
   Key #region ke ka log
 
 val encrypt: k:key -> m:Plain.plain -> ST cipher

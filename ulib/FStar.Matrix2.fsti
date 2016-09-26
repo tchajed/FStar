@@ -44,7 +44,7 @@ val lemma_col_len: #a:Type -> m:nat -> n:nat -> x:matrix2 m n a -> j:nat{j<n} ->
   [SMTPat (Seq.length (col x j))]
 
 (* Lemmas about index *)
-val lemma_index_create: #a:Type -> m:nat -> n:nat -> v:a -> i:nat{i < m} -> j:nat{j < n} -> Lemma
+val index_create: #a:Type -> m:nat -> n:nat -> v:a -> i:nat{i < m} -> j:nat{j < n} -> Lemma
   (requires True)
   (ensures (index (create m n v) i j == v))
   [SMTPat (index (create m n v) i j)]

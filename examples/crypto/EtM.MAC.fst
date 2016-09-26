@@ -48,11 +48,11 @@ let genPost parent h0 (k:key) h1 =
   /\ extends k.region parent
   /\ fresh_region k.region h0 h1
   /\ m_contains k.log h1
-  /\ m_sel h1 k.log == createEmpty
+  /\ m_sel h1 k.log == empty
   (* CH: equivalent definition makes gen fail:
          /\ (m_sel h1 k.log).length == 0
          can't even prove:
-           assert((createEmpty #key).length == 0); *)
+           assert((empty #key).length == 0); *)
 
 val keygen: parent:rid -> ST key
   (requires (fun _ -> True))
@@ -61,7 +61,7 @@ val keygen: parent:rid -> ST key
 let keygen parent =
   let raw = random keysize in
   let region = new_region parent in
-  let log = alloc_mref_seq region createEmpty in
+  let log = alloc_mref_seq region empty in
   Key #region raw log
 
 val mac: k:key -> m:msg -> ST tag

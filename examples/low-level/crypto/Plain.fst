@@ -36,7 +36,7 @@ val load_bytes: l:UInt32.t -> buf:lbuffer(v l) -> Stack (lbytes(v l))
   (ensures (fun h0 r h1 -> h0 == h1 /\ Buffer.live h0 buf /\ r == sel_bytes h1 l buf))
 let rec load_bytes l buf = 
   assume false;//16-09-21 TODO 
-  if l = 0ul then Seq.createEmpty else
+  if l = 0ul then Seq.empty else
   let b = Buffer.index buf 0ul in
   let t = load_bytes (l -^ 1ul) (Buffer.sub buf 1ul (l -^ 1ul)) in
   SeqProperties.cons b t

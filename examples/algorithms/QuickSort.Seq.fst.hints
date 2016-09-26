@@ -51,7 +51,7 @@
         "fuel_irrelevance_FStar.SeqProperties.count.fuel_instrumented",
         "int_inversion", "int_typing",
         "interpretation_Tm_arrow_4c138685807de122ddf5307392e2b2e9",
-        "lemma_FStar.Seq.lemma_index_slice",
+        "lemma_FStar.Seq.index_slice",
         "lemma_FStar.Seq.lemma_index_upd1",
         "lemma_FStar.Seq.lemma_index_upd2",
         "lemma_FStar.Seq.lemma_len_slice", "lemma_FStar.Seq.lemma_len_upd",

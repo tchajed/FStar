@@ -106,7 +106,7 @@ let log_ref (r:rid) = if ideal then ideal_log r else unit
 
 let ilog (#r:rid) (l:log_ref r{ideal}) : Tot (ideal_log r) = l
 
-let text_0: itext = if ideal then Seq.createEmpty #elem else ()
+let text_0: itext = if ideal then Seq.empty #elem else ()
 
 noeq type state (i:id) =
   | State:
@@ -223,8 +223,8 @@ val seq_head_snoc: #a:Type -> xs:Seq.seq a -> x:a ->
         (ensures Seq.length (SeqProperties.snoc xs x) > 0 /\
                  seq_head (SeqProperties.snoc xs x) == xs)
 let seq_head_snoc #a xs x =
-  Seq.lemma_len_append xs (Seq.create 1 x);
-  Seq.lemma_eq_intro (seq_head (SeqProperties.snoc xs x)) xs
+  Seq.length_append xs (Seq.create 1 x);
+  Seq.eq_intro (seq_head (SeqProperties.snoc xs x)) xs
 
 #set-options "--print_fuels --initial_fuel 1 --initial_ifuel 1"
 
@@ -245,7 +245,7 @@ let update #i st l a v =
   if ideal then
     let v = sel_elemT v in
     let vs = SeqProperties.snoc l v in
-    Seq.lemma_index_app2 l (Seq.create 1 v) (Seq.length vs - 1);
+    Seq.index_append_right l (Seq.create 1 v) (Seq.length vs - 1);
     seq_head_snoc l v;
     //assert (Seq.index vs (Seq.length vs - 1) == v');
     //assert (seq_head vs == l);

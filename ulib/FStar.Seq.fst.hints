@@ -281,7 +281,7 @@
       0
     ],
     [
-      "FStar.Seq.lemma_index_create",
+      "FStar.Seq.index_create",
       1,
       0,
       1,
@@ -289,7 +289,7 @@
       0
     ],
     [
-      "FStar.Seq.lemma_index_create",
+      "FStar.Seq.index_create",
       2,
       0,
       1,
@@ -450,7 +450,7 @@
       0
     ],
     [
-      "FStar.Seq.lemma_index_slice",
+      "FStar.Seq.index_slice",
       1,
       0,
       1,
@@ -471,7 +471,7 @@
       0
     ],
     [
-      "FStar.Seq.lemma_index_slice",
+      "FStar.Seq.index_slice",
       2,
       0,
       1,
@@ -616,7 +616,7 @@
       0
     ],
     [
-      "FStar.Seq.lemma_eq_intro",
+      "FStar.Seq.eq_intro",
       1,
       0,
       1,
@@ -626,9 +626,9 @@
       ],
       0
     ],
-    [ "FStar.Seq.lemma_eq_intro", 2, 0, 1, [ "@query" ], 0 ],
+    [ "FStar.Seq.eq_intro", 2, 0, 1, [ "@query" ], 0 ],
     [
-      "FStar.Seq.lemma_eq_intro",
+      "FStar.Seq.eq_intro",
       3,
       0,
       1,
@@ -648,9 +648,9 @@
       0
     ],
     [ "FStar.Seq.Extensionality", 1, 0, 1, [ "@query" ], 0 ],
-    [ "FStar.Seq.lemma_eq_elim", 1, 0, 1, [ "@query" ], 0 ],
+    [ "FStar.Seq.eq_elim", 1, 0, 1, [ "@query" ], 0 ],
     [
-      "FStar.Seq.lemma_eq_elim",
+      "FStar.Seq.eq_elim",
       2,
       0,
       1,

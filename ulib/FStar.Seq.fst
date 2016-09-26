@@ -40,25 +40,29 @@ abstract val of_list: #a:Type -> list a -> Tot (seq a)
 let of_list #a l =
   MkSeq (L.length l) (L.index l)
 
-abstract val lemma_of_list_length: #a:Type -> s:seq a -> l:list a -> Lemma
+abstract val length_of_list: #a:Type -> s:seq a -> l:list a -> Lemma
   (requires (s == of_list #a l))
   (ensures (length s = L.length l))
   [SMTPat (length s = L.length l)]
-let lemma_of_list_length #a s l  = ()
+let length_of_list #a s l  = ()
 
-abstract val lemma_of_list: #a:Type -> s:seq a -> l:list a -> i:nat{i < length s} -> Lemma
+abstract val index_of_list: #a:Type -> s:seq a -> l:list a -> i:nat{i < length s} -> Lemma
   (requires (s == of_list l))
   (ensures (s == of_list l /\ L.length l = length s /\ index s i == L.index l i))
   [SMTPat (index s i == L.index l i)]
-let lemma_of_list #a s l i = ()
+let index_of_list #a s l i = ()
+
+(* TR: should be renamed into something like lemma_lt_n_0_aux *)
 
 private val exFalso0 : a:Type -> n:nat{n<0} -> Tot a
 let exFalso0 a n = ()
 
 (* CH: Seq.empty or emptySeq would be a better name for this? *)
-abstract val createEmpty: #a:Type -> Tot (s:(seq a){length s=0})
-let createEmpty #a = MkSeq 0 (fun i -> (exFalso0 a i))
+(* TR: I'm in favor of [empty], cf. [FStar.Set.empty] *)
+abstract val empty: #a:Type -> Tot (s:(seq a){length s=0})
+let empty #a = MkSeq 0 (fun i -> (exFalso0 a i))
 
+(* TR: upd -> [update]? *)
 abstract val upd:    #a:Type -> s:seq a -> n:nat{n < length s} -> a ->  Tot (seq a)
 let upd #a s n v =
   MkSeq (length s) (fun i -> if i=n then v else index s i)
@@ -73,72 +77,87 @@ let slice #a s i j =
   MkSeq (j-i) (fun x -> index s (x + i))
 
 (* Lemmas about length *)
-abstract val lemma_create_len: #a:Type -> n:nat -> i:a -> Lemma
+
+(* TR: len -> length *)
+(* TR: create_length -> length_create *)
+
+abstract val length_create: #a:Type -> n:nat -> i:a -> Lemma
   (requires True)
   (ensures (length (create n i) = n))
   [SMTPat (length (create n i))]
-let lemma_create_len #a n i   = ()
+let length_create #a n i   = ()
 
-abstract val lemma_init_len: #a:Type -> n:nat -> contents: (i:nat { i < n } -> Tot a) -> Lemma
+abstract val length_init: #a:Type -> n:nat -> contents: (i:nat { i < n } -> Tot a) -> Lemma
   (requires True)
   (ensures (length (init n contents) = n))
   [SMTPat (length (create n contents))]
-let lemma_init_len #a n contents = ()
+let length_init #a n contents = ()
 
-abstract val lemma_len_upd: #a:Type -> n:nat -> v:a -> s:seq a{n < length s} -> Lemma
+(* TR: len -> length, upd_length -> length_upd *)
+
+abstract val length_upd: #a:Type -> n:nat -> v:a -> s:seq a{n < length s} -> Lemma
   (requires True)
   (ensures (length (upd s n v) = length s))
   [SMTPat (length (upd s n v))]
-let lemma_len_upd #a n v s    = ()
+let length_upd #a n v s    = ()
 
-abstract val lemma_len_append: #a:Type -> s1:seq a -> s2:seq a -> Lemma
+abstract val length_append: #a:Type -> s1:seq a -> s2:seq a -> Lemma
   (requires True)
   (ensures (length (append s1 s2) = length s1 + length s2))
   [SMTPat (length (append s1 s2))]
-let lemma_len_append #a s1 s2 = ()
+let length_append #a s1 s2 = ()
 
-abstract val lemma_len_slice: #a:Type -> s:seq a -> i:nat -> j:nat{i <= j && j <= length s} -> Lemma
+abstract val length_slice: #a:Type -> s:seq a -> i:nat -> j:nat{i <= j && j <= length s} -> Lemma
   (requires True)
   (ensures (length (slice s i j) = j - i))
   [SMTPat (length (slice s i j))]
-let lemma_len_slice #a s i j  = ()
+let length_slice #a s i j  = ()
 
 (* Lemmas about index *)
-abstract val lemma_index_create: #a:Type -> n:nat -> v:a -> i:nat{i < n} -> Lemma
+abstract val index_create: #a:Type -> n:nat -> v:a -> i:nat{i < n} -> Lemma
   (requires True)
   (ensures (index (create n v) i == v))
   [SMTPat (index (create n v) i)]
-let lemma_index_create #a n v i  = ()
+let index_create #a n v i  = ()
 
-abstract val lemma_index_upd1: #a:Type -> s:seq a -> n:nat{n < length s} -> v:a -> Lemma
+(* TR: Here we should avoid 1, 2, etc. as lemma names, in favor of more expressive suffixes
+   example: for update-like features, same vs. other,
+   for binary operations: left vs. right,
+   etc. *)
+
+abstract val index_upd_same: #a:Type -> s:seq a -> n:nat{n < length s} -> v:a -> Lemma
   (requires True)
   (ensures (index (upd s n v) n == v))
   [SMTPat (index (upd s n v) n)]
-let lemma_index_upd1 #a n v s    = ()
+let index_upd_same #a n v s    = ()
 
-abstract val lemma_index_upd2: #a:Type -> s:seq a -> n:nat{n < length s} -> v:a -> i:nat{i<>n /\ i < length s} -> Lemma
+abstract val index_upd_other: #a:Type -> s:seq a -> n:nat{n < length s} -> v:a -> i:nat{i<>n /\ i < length s} -> Lemma
   (requires True)
   (ensures (index (upd s n v) i == index s i))
   [SMTPat (index (upd s n v) i)]
-let lemma_index_upd2 #a n v s i  = ()
+let index_upd_other #a n v s i  = ()
 
-abstract val lemma_index_app1: #a:Type -> s1:seq a -> s2:seq a -> i:nat{i < length s1} -> Lemma
+(* TR: question: _left -> _l? *)
+
+abstract val index_append_left: #a:Type -> s1:seq a -> s2:seq a -> i:nat{i < length s1} -> Lemma
   (requires True)
   (ensures (index (append s1 s2) i == index s1 i))
   [SMTPat (index (append s1 s2) i)]
-let lemma_index_app1 #a s1 s2 i  = ()
+let index_append_left #a s1 s2 i  = ()
 
-abstract val lemma_index_app2: #a:Type -> s1:seq a -> s2:seq a -> i:nat{i < length s1 + length s2 /\ length s1 <= i} -> Lemma
+(* TR: question: _right -> _r? *)
+
+abstract val index_append_right: #a:Type -> s1:seq a -> s2:seq a -> i:nat{i < length s1 + length s2 /\ length s1 <= i} -> Lemma
   (requires True)
   (ensures (index (append s1 s2) i == index s2 (i - length s1)))
   [SMTPat (index (append s1 s2) i)]
-let lemma_index_app2 #a s2 s2 i  = ()
+let index_append_right #a s2 s2 i  = ()
 
-abstract val lemma_index_slice: #a:Type -> s:seq a -> i:nat -> j:nat{i <= j /\ j <= length s} -> k:nat{k < j - i} -> Lemma
+abstract val index_slice: #a:Type -> s:seq a -> i:nat -> j:nat{i <= j /\ j <= length s} -> k:nat{k < j - i} -> Lemma
   (requires True)
   (ensures (index (slice s i j) k == index s (k + i)))
   [SMTPat (index (slice s i j) k)]
-let lemma_index_slice #a s i j k = ()
+let index_slice #a s i j k = ()
 
 abstract type equal (#a:Type) (s1:seq a) (s2:seq a) =
   (length s1 = length s2
@@ -159,12 +178,12 @@ let rec eq_i #a s1 s2 i =
 abstract val eq: #a:eqtype -> s1:seq a -> s2:seq a -> Tot (r:bool{r <==> equal s1 s2})
 let eq #a s1 s2 = if length s1 = length s2 then eq_i s1 s2 0 else false
 
-abstract val lemma_eq_intro: #a:Type -> s1:seq a -> s2:seq a -> Lemma
+abstract val eq_intro: #a:Type -> s1:seq a -> s2:seq a -> Lemma
      (requires (length s1 = length s2
                /\ (forall (i:nat{i < length s1}).{:pattern (index s1 i); (index s2 i)} (index s1 i == index s2 i))))
      (ensures (equal s1 s2))
      [SMTPatT (equal s1 s2)]
-let lemma_eq_intro #a s1 s2 = ()
+let eq_intro #a s1 s2 = ()
 
 abstract val lemma_eq_refl: #a:Type -> s1:seq a -> s2:seq a -> Lemma
      (requires (s1 == s2))
@@ -175,8 +194,8 @@ let lemma_eq_refl #a s1 s2  = ()
 (*TODO: Would be nice to to not have to assume this again and instead derive it from feq
   But, it doesn't work because in order to use feq, we need to show that s1.contents has type (efun e b) *)
 assume Extensionality: forall (a:Type) (s1:seq a) (s2:seq a).{:pattern (equal s1 s2)} equal s1 s2 <==> (s1==s2)
-abstract val lemma_eq_elim: #a:Type -> s1:seq a -> s2:seq a -> Lemma
+abstract val eq_elim: #a:Type -> s1:seq a -> s2:seq a -> Lemma
      (requires (equal s1 s2))
      (ensures (s1==s2))
      [SMTPatT (equal s1 s2)]
-let lemma_eq_elim #a s1 s2  = ()
+let eq_elim #a s1 s2  = ()

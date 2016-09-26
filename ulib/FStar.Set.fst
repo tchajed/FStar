@@ -43,6 +43,13 @@ let complement #a s    = fun x -> not (s x)
 type subset (#a:eqtype) (s1:set a) (s2:set a) :Type0 = forall x. mem x s1 ==> mem x s2
 
 (* Properties *)
+(* TR: do we need to prefix their names with [lemma_] as in FStar.Seq?
+   In Coq, this is not necessary, since lemmas can be used in proof terms
+   In F*, I claim that the philosophy is different, since there is no such
+   notion of proof terms.
+   Question: then, why are lemmas defined in the same "namespace" (or even
+   syntactic category) as ordinary terms?
+ *)
 abstract val mem_empty: #a:eqtype -> x:a -> Lemma
    (requires True)
    (ensures (not (mem x empty)))

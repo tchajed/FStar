@@ -18,7 +18,7 @@ val append_inj_lemma: b1:message -> b2:message
                             (ensures (b2t (Seq.eq b1 c1) /\ b2t (Seq.eq b2 c2)))
                             [SMTPat (b1 @| b2); SMTPat (c1 @| c2)] (* given to the SMT solver *)
 let append_inj_lemma b1 b2 c1 c2 =
-  lemma_append_len_disj b1 b2 c1 c2;
+  lemma_append_length_disj b1 b2 c1 c2;
   Classical.forall_intro #_ #(fun (x:(i:nat{i < length b1})) -> index b1 x == index c1 x) (lemma_append_inj_l b1 b2 c1 c2); //sadly, the 2nd implicit argument has to be provided explicitly
   Classical.forall_intro #_ #(fun (x:(i:nat{i < length b2})) -> index b2 x == index c2 x) (lemma_append_inj_r b1 b2 c1 c2)  //should fix this soon (NS)
 

@@ -53,7 +53,7 @@ let equal_bytes b b' : GTot Type0 = to_seq_byte b == to_seq_byte b'
 let lemma_eq_intro (b:bytes) (b':bytes) : Lemma
   (requires (length_bytes b = length_bytes b' /\ (forall (i:nat). i < length_bytes b ==> index_bytes b (uint_to_t i) == index_bytes b' (uint_to_t i))))
   (ensures  (equal_bytes b b')) =
-    Seq.lemma_eq_intro (to_seq_byte b) (to_seq_byte b')
+    Seq.eq_intro (to_seq_byte b) (to_seq_byte b')
 
 (** **************************************************************** **)
 (**           Defining serializable types of fixed length            **)
@@ -205,7 +205,7 @@ val split: #t':sizeof_t -> #ty:serializable t' ->
 let split #t' #ty b i = 
   let fst = sub #t' #ty b 0ul i in
   let snd = offset #t' #ty  b i in
-  Seq.lemma_eq_intro (to_seq fst @| to_seq snd) (to_seq b);
+  Seq.eq_intro (to_seq fst @| to_seq snd) (to_seq b);
   {fst = fst ; snd = snd}
 
 (* Cast a "buffer type" to its unrefined "bytes" type *)

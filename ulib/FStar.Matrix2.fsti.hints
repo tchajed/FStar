@@ -50,7 +50,7 @@
       0
     ],
     [ "FStar.Matrix2.lemma_col_len", 2, 0, 0, [ "@query" ], 0 ],
-    [ "FStar.Matrix2.lemma_index_create", 1, 0, 0, [ "@query" ], 0 ],
+    [ "FStar.Matrix2.index_create", 1, 0, 0, [ "@query" ], 0 ],
     [ "FStar.Matrix2.lemma_index_upd1", 1, 0, 0, [ "@query" ], 0 ],
     [
       "FStar.Matrix2.lemma_index_upd2",

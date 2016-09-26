@@ -45,7 +45,7 @@
         "equation_CntFormat.message", "equation_FStar.Char.char",
         "equation_FStar.Seq.op_At_Bar", "equation_Platform.Bytes.byte",
         "equation_Platform.Bytes.bytes", "equation_Prims.eqtype",
-        "kinding_FStar.Char.char_@tok", "lemma_FStar.Seq.lemma_eq_intro",
+        "kinding_FStar.Char.char_@tok", "lemma_FStar.Seq.eq_intro",
         "pretyping_f537159ed795b314b4e58c260361ae86",
         "refinement_interpretation_Tm_refine_414d0a9f578ab0048252f8c8f552b99f",
         "refinement_interpretation_Tm_refine_d4aaeb44afd9014ffa1175af1903c82d",

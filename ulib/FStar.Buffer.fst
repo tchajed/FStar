@@ -718,7 +718,7 @@ let create #a (init:a) (len:UInt32.t) : StackInline (buffer a)
   = let content = salloc (Seq.create (v len) init) in
     let h = HST.get() in
     let b = {content = content; idx = (uint_to_t 0); length = len} in
-    Seq.lemma_eq_intro (as_seq h b) (sel h b);
+    Seq.eq_intro (as_seq h b) (sel h b);
     b
 
 module L = FStar.List.Tot
@@ -739,12 +739,12 @@ let createL #a (init:list a) : StackInline (buffer a)
   =
     let len = UInt32.uint_to_t (L.length init) in
     let s = Seq.of_list init in
-    lemma_of_list_length s init;
+    length_of_list s init;
     assert (Seq.length s < UInt.max_int 32);
     let content = salloc (Seq.of_list init) in
     let h = HST.get() in
     let b = {content = content; idx = (uint_to_t 0); length = len} in
-    Seq.lemma_eq_intro (as_seq h b) (sel h b);
+    Seq.eq_intro (as_seq h b) (sel h b);
     b
 
 
@@ -770,7 +770,7 @@ let rcreate #a (r:HH.rid) (init:a) (len:UInt32.t) : ST (buffer a)
     let content = ralloc r s in
     let h' = HST.get() in
     let b = {content = content; idx = (uint_to_t 0); length = len} in
-    Seq.lemma_eq_intro (as_seq h' b) (sel h' b);
+    Seq.eq_intro (as_seq h' b) (sel h' b);
     lemma_upd h content s;
     b
 
@@ -810,8 +810,8 @@ let upd #a b n z =
   let s = Seq.upd s0 (v b.idx + v n) z in
   b.content := s;
   let h = HST.get() in
-  Seq.lemma_eq_intro (as_seq h b) (Seq.slice s (idx b) (idx b + length b));
-  Seq.lemma_eq_intro (Seq.upd (Seq.slice s0 (idx b) (idx b + length b)) (v n) z)
+  Seq.eq_intro (as_seq h b) (Seq.slice s (idx b) (idx b + length b));
+  Seq.eq_intro (Seq.upd (Seq.slice s0 (idx b) (idx b + length b)) (v n) z)
   		     (Seq.slice (Seq.upd s0 (idx b + v n) z) (idx b) (idx b + length b));
   ()
 
@@ -827,7 +827,7 @@ let lemma_sub_spec (#a:Type) (b:buffer a)
      (requires (live h b))
      (ensures  (live h b /\ as_seq h (sub b i len) == Seq.slice (as_seq h b) (v i) (v i + v len)))
      [SMTPat (sub b i len); SMTPat (live h b)]
-  = Seq.lemma_eq_intro (as_seq h (sub b i len)) (Seq.slice (as_seq h b) (v i) (v i + v len))
+  = Seq.eq_intro (as_seq h (sub b i len)) (Seq.slice (as_seq h b) (v i) (v i + v len))
 
 let offset #a (b:buffer a) (i:UInt32.t{v i + v b.idx < pow2 n /\ v i <= v b.length}) : Tot (b':buffer a{b `includes` b'})
   = {content = b.content; idx = i +^ b.idx; length = b.length -^ i}
@@ -838,7 +838,7 @@ let lemma_offset_spec (#a:Type) (b:buffer a)
      (requires (live h b))
      (ensures  (live h b /\ as_seq h (offset b i) == Seq.slice (as_seq h b) (v i) (length b)))
      [SMTPat (offset b i); SMTPat (live h b)]
-  = Seq.lemma_eq_intro (as_seq h (offset b i)) (Seq.slice (as_seq h b) (v i) (length b))
+  = Seq.eq_intro (as_seq h (offset b i)) (Seq.slice (as_seq h b) (v i) (length b))
   
 private val eq_lemma1:
     #a:eqtype
@@ -852,7 +852,7 @@ private val eq_lemma1:
     (ensures  equal h (sub b1 0ul len) h (sub b2 0ul len))
     [SMTPatT (equal h (sub b1 0ul len) h (sub b2 0ul len))]
 let eq_lemma1 #a b1 b2 len h =
-  Seq.lemma_eq_intro (as_seq h (sub b1 0ul len)) (as_seq h (sub b2 0ul len))
+  Seq.eq_intro (as_seq h (sub b1 0ul len)) (as_seq h (sub b2 0ul len))
 
 private val eq_lemma2:
     #a:eqtype

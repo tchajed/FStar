@@ -159,7 +159,7 @@ let lemma_little_endian_is_injective_2 b len =
   let s = Seq.slice b (Seq.length b - len) (Seq.length b) in
   let s' = Seq.slice s 1 (Seq.length s) in
   let s'' = Seq.slice b (Seq.length b - (len - 1)) (Seq.length b) in
-  Seq.lemma_eq_intro s' s''
+  Seq.eq_intro s' s''
 
 val lemma_little_endian_is_injective_3: b:word -> b':word -> len:pos{len <= Seq.length b /\ len <= Seq.length b'} -> Lemma
   (requires (Seq.slice b (Seq.length b - (len - 1)) (Seq.length b) ==
@@ -168,9 +168,9 @@ val lemma_little_endian_is_injective_3: b:word -> b':word -> len:pos{len <= Seq.
   (ensures  (Seq.slice b (Seq.length b - len) (Seq.length b) ==
              Seq.slice b' (Seq.length b' - len) (Seq.length b')))
 let lemma_little_endian_is_injective_3 b b' len =
-  Seq.lemma_eq_intro (Seq.slice b' (Seq.length b' - len) (Seq.length b'))
+  Seq.eq_intro (Seq.slice b' (Seq.length b' - len) (Seq.length b'))
 		     (Seq.append (Seq.create 1 (Seq.index b' (Seq.length b' - len))) (Seq.slice b' (Seq.length b' - (len-1)) (Seq.length b')));
-  Seq.lemma_eq_intro (Seq.slice b (Seq.length b - len) (Seq.length b))
+  Seq.eq_intro (Seq.slice b (Seq.length b - len) (Seq.length b))
 		     (Seq.append (Seq.create 1 (Seq.index b (Seq.length b - len))) (Seq.slice b (Seq.length b - (len-1)) (Seq.length b)))
 
 val lemma_little_endian_is_injective: b:word -> b':word ->
@@ -181,7 +181,7 @@ val lemma_little_endian_is_injective: b:word -> b':word ->
              Seq.slice b' (Seq.length b' - len) (Seq.length b')))
 let rec lemma_little_endian_is_injective b b' len =
   if len = 0 then
-    Seq.lemma_eq_intro (Seq.slice b (Seq.length b - len) (Seq.length b))
+    Seq.eq_intro (Seq.slice b (Seq.length b - len) (Seq.length b))
 		       (Seq.slice b' (Seq.length b' - len) (Seq.length b'))
   else
     begin
@@ -205,7 +205,7 @@ val lemma_pad_0_injective: b0:Seq.seq UInt8.t -> b1:Seq.seq UInt8.t -> l:nat -> 
   (ensures  (b0 == b1))
 let lemma_pad_0_injective b0 b1 l =
   SeqProperties.lemma_append_inj b0 (Seq.create l 0uy) b1 (Seq.create l 0uy);
-  Seq.lemma_eq_intro b0 b1
+  Seq.eq_intro b0 b1
 
 val lemma_encode_16_injective: w0:word_16 -> w1:word_16 -> Lemma
   (requires (encode_16 w0 == encode_16 w1))
@@ -215,8 +215,8 @@ let lemma_encode_16_injective w0 w1 =
   lemma_little_endian_lt_2_128 w1;
   lemma_mod_plus_injective p_1305 (pow2 128) (little_endian w0) (little_endian w1);
   assert (little_endian w0 == little_endian w1);
-  Seq.lemma_eq_intro (Seq.slice w0 0 16) w0;
-  Seq.lemma_eq_intro (Seq.slice w1 0 16) w1;
+  Seq.eq_intro (Seq.slice w0 0 16) w0;
+  Seq.eq_intro (Seq.slice w1 0 16) w1;
   lemma_little_endian_is_injective w0 w1 16
 
 #reset-options "--initial_fuel 1 --max_fuel 1 --initial_ifuel 0 --max_ifuel 0"
@@ -229,7 +229,7 @@ val lemma_encode_pad_injective: p0:Seq.seq elem -> t0:Seq.seq UInt8.t -> p1:Seq.
   (decreases (Seq.length t0))
 let rec lemma_encode_pad_injective p0 t0 p1 t1 =
   let l = Seq.length t0 in
-  if l = 0 then Seq.lemma_eq_intro t0 t1
+  if l = 0 then Seq.eq_intro t0 t1
   else if l < 16 then
     begin
     let w0 = pad_0 t0 (16 - l) in
@@ -237,8 +237,8 @@ let rec lemma_encode_pad_injective p0 t0 p1 t1 =
     SeqProperties.lemma_append_inj
       p0 (Seq.create 1 (encode_16 w0))
       p1 (Seq.create 1 (encode_16 w1));
-    lemma_index_create 1 (encode_16 w0) 0;
-    lemma_index_create 1 (encode_16 w1) 0;
+    index_create 1 (encode_16 w0) 0;
+    index_create 1 (encode_16 w1) 0;
     lemma_encode_16_injective w0 w1;
     lemma_pad_0_injective t0 t1 (16 -l)
     end
@@ -252,8 +252,8 @@ let rec lemma_encode_pad_injective p0 t0 p1 t1 =
     SeqProperties.lemma_append_inj
       p0 (Seq.create 1 (encode_16 w0))
       p1 (Seq.create 1 (encode_16 w1));
-    lemma_index_create 1 (encode_16 w0) 0;
-    lemma_index_create 1 (encode_16 w1) 0;
+    index_create 1 (encode_16 w0) 0;
+    index_create 1 (encode_16 w1) 0;
     lemma_encode_16_injective w0 w1
 
 val encode_pad_empty: prefix:Seq.seq elem -> txt:Seq.seq UInt8.t -> Lemma
@@ -265,12 +265,12 @@ val encode_pad_snoc: prefix:Seq.seq elem -> txt:Seq.seq UInt8.t -> w:word_16 -> 
   (encode_pad (SeqProperties.snoc prefix (encode_16 w)) txt ==
    encode_pad prefix (append w txt))
 let encode_pad_snoc prefix txt w =
-  Seq.lemma_len_append w txt;
+  Seq.length_append w txt;
   assert (16 <= Seq.length (append w txt));
   let w', txt' = SeqProperties.split (append w txt) 16 in
   let prefix' = SeqProperties.snoc prefix (encode_16 w') in
-  Seq.lemma_eq_intro w w';
-  Seq.lemma_eq_intro txt txt'
+  Seq.eq_intro w w';
+  Seq.eq_intro txt txt'
 
 (* * *********************************************)
 (* *        Poly1305 functional invariant        *)

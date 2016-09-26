@@ -36,8 +36,8 @@ let lemma_slice_sub_2 s (a:nat) (b:nat) (a':nat) (b':nat{b - a >= b' /\ a <= b /
     lemma_slice_0 s1 a' b';
     lemma_slice_0 s (a+a') (a+b');
     assert(forall (i:nat). i < b' - a' ==> Seq.index s2 i == Seq.index s (i+a+a'));
-    Seq.lemma_eq_intro s2 s3;
-    Seq.lemma_eq_elim s2 s3
+    Seq.eq_intro s2 s3;
+    Seq.eq_elim s2 s3
 
 let lemma_equal s s' (i:nat) : Lemma
   (requires (s == s' /\ i < Seq.length s))
@@ -93,16 +93,16 @@ let rec f_seq_lemma_0 #a f s1 s2 s1' s2' len =
 val lemma_slice_append: #a:Type -> s:Seq.seq a -> i:nat{i < Seq.length s} -> Lemma
   (Seq.slice s 0 (i+1) == Seq.append (Seq.slice s 0 i) (Seq.create 1 (Seq.index s i)))
 let lemma_slice_append #a s i = 
-  Seq.lemma_eq_intro (Seq.slice s 0 (i+1)) (Seq.append (Seq.slice s 0 i) (Seq.create 1 (Seq.index s i)))
+  Seq.eq_intro (Seq.slice s 0 (i+1)) (Seq.append (Seq.slice s 0 i) (Seq.create 1 (Seq.index s i)))
 
 val lemma_seq_upd: #a:Type -> s:Seq.seq a -> s':Seq.seq a -> s'':Seq.seq a -> i:nat{i < Seq.length s} -> oi:a -> Lemma
   (requires (s' == Seq.upd s i oi /\ Seq.length s'' >= Seq.length s /\ Seq.slice s'' i (Seq.length s) == Seq.slice s' i (Seq.length s)))
   (ensures  (Seq.length s'' >= Seq.length s /\ Seq.slice s'' (i+1) (Seq.length s) == Seq.slice s (i+1) (Seq.length s)))
 let lemma_seq_upd #a s s' s'' i oi =
-  Seq.lemma_eq_intro (Seq.slice s' (i+1) (Seq.length s)) (Seq.slice s (i+1) (Seq.length s));
+  Seq.eq_intro (Seq.slice s' (i+1) (Seq.length s)) (Seq.slice s (i+1) (Seq.length s));
   assert(Seq.slice s'' (i+1) (Seq.length s) == Seq.slice (Seq.slice s'' i (Seq.length s)) 1 (Seq.length s - i));
   assert(Seq.slice s' (i+1) (Seq.length s) == Seq.slice (Seq.slice s' i (Seq.length s)) 1 (Seq.length s - i));
-  Seq.lemma_eq_intro (Seq.slice s'' (i+1) (Seq.length s)) (Seq.slice s' (i+1) (Seq.length s))
+  Seq.eq_intro (Seq.slice s'' (i+1) (Seq.length s)) (Seq.slice s' (i+1) (Seq.length s))
 
 #reset-options "--z3timeout 20"
 #set-options "--max_fuel 1 --initial_fuel 1"
@@ -179,7 +179,7 @@ val xor_bytes_inplace: output:bytes -> in1:bytes{disjoint in1 output} ->
 let rec xor_bytes_inplace output in1 len =
   if UInt32.eq len 0ul then
     let h = HST.get() in
-    Seq.lemma_eq_intro (Seq.slice (to_seq8 h output) 0 0) (Seq.createEmpty #UInt8.t)
+    Seq.eq_intro (Seq.slice (to_seq8 h output) 0 0) (Seq.createEmpty #UInt8.t)
   else
     begin
       let h0 = HST.get() in
@@ -211,7 +211,7 @@ val xor_u16s_inplace: output:u16s -> in1:u16s{disjoint in1 output} ->
 let rec xor_u16s_inplace output in1 len =
   if UInt32.eq len 0ul then
     let h = HST.get() in
-    Seq.lemma_eq_intro (Seq.slice (to_seq16 h output) 0 0) (Seq.createEmpty #UInt16.t)
+    Seq.eq_intro (Seq.slice (to_seq16 h output) 0 0) (Seq.createEmpty #UInt16.t)
   else
     begin
       let h0 = HST.get() in

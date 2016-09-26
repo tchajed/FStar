@@ -68,7 +68,7 @@ let rec partition #a f start len pivot back x =
   then
     begin
 (*ghost*)      (let s = sel h0 x in
-(*ghost*)       lemma_slice_cons s pivot len;
+(*ghost*)       lemma_mem_slice_cons s pivot len;
 (*ghost*)       splice_refl s start len);
       pivot
     end
@@ -134,7 +134,7 @@ let lemma_slice_cons_pv #a s i pivot j pv =
   cut (Seq.equal (slice s i j) (append lo (cons pv hi)))
 
 #reset-options
-#set-options "--initial_fuel 1 --initial_ifuel 0 --max_fuel 1 --max_ifuel 0 --z3timeout 15"
+#set-options "--initial_fuel 1 --initial_ifuel 0 --max_fuel 1 --max_ifuel 0 --z3timeout 60"
 val sort: #a:eqtype -> f:tot_ord a -> i:nat -> j:nat{i <= j} -> x:array a
           -> ST unit
   (requires (fun h -> contains h x /\ j <= length (sel h x)))
@@ -168,7 +168,7 @@ let rec sort #a f i j x =
 (* ghost *)    let lo = slice (sel h3 x) i pivot in
 (* ghost *)    let hi = slice (sel h3 x) (pivot + 1) j in
 (* ghost *)    let pv = index (sel h1 x) pivot in
-(* ghost *)    SeqProperties.sorted_concat_lemma f lo pv hi;
+(* ghost *)    SeqProperties.lemma_sorted_append_cons f lo pv hi;
 (* ghost *)    lemma_slice_cons_pv (sel h3 x) i pivot j pv;
 
 (* ghost *)    lemma_weaken_frame_right (sel h2 x) (sel h1 x) i pivot j;

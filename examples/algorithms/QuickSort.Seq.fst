@@ -7,7 +7,7 @@ open FStar.SeqProperties
 #set-options "--max_fuel 0 --initial_fuel 0 --initial_ifuel 0 --max_ifuel 0" *)
 
 (* CH: this is needed on my machine, intermittent failures otherwise *)
-#reset-options "--z3timeout 20"
+#reset-options "--z3timeout 60"
 
 val partition: #a:eqtype -> f:(a -> a -> Tot bool){total_order a f}
     -> s:seq a -> pivot:nat{pivot < length s} -> back:nat{pivot <= back /\ back < length s} ->
@@ -64,8 +64,8 @@ let rec sort #a f s =
 
        let result = Seq.append l (cons pivot h) in
 
-       sorted_concat_lemma f l pivot h;
-       lemma_append_count l (cons pivot h);
+       lemma_sorted_append_cons f l pivot h;
+       lemma_count_append l (cons pivot h);
        cons_perm h hi;
 
        result
