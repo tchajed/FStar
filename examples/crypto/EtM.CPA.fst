@@ -86,18 +86,18 @@ let encryption_injective k iv t1 t2 = correctness k iv t1; correctness k iv t2
 
 (* this doesn't really belong here *)
 val mem : #a:eqtype -> x:a -> xs:Seq.seq a -> Tot bool
-let mem (#a:eqtype) x xs = is_Some (SeqProperties.seq_find (fun y -> y = x) xs)
+let mem (#a:eqtype) x xs = is_Some (SeqProperties.find (fun y -> y = x) xs)
 
 val decrypt: k:key -> c:cipher -> ST msg
   (requires (fun h0 ->
     Map.contains h0 k.region /\
     (let log0 = m_sel h0 k.log in
-      (b2t ind_cpa_rest_adv) ==> is_Some (seq_find (fun mc -> snd mc = c) log0))))
+      (b2t ind_cpa_rest_adv) ==> is_Some (SeqProperties.find (fun mc -> snd mc = c) log0))))
   (ensures  (fun h0 res h1 ->
     modifies_none h0 h1 /\
     ( (b2t ind_cpa_rest_adv) ==> mem (res,c) (m_sel h0 k.log)
      (* (let log0 = m_sel h0 k.log in *) //specification of correctness
-     (*  let found = seq_find (fun mc -> snd mc = c) log0 in *)
+     (*  let found = SeqProperties.find (fun mc -> snd mc = c) log0 in *)
      (*  is_Some found /\ fst (Some.v found) = res) *)
     )
   )
@@ -106,7 +106,7 @@ val decrypt: k:key -> c:cipher -> ST msg
 let decrypt k c =
   if ind_cpa_rest_adv then
     let log = m_read k.log in
-    match seq_find (fun mc -> snd mc = c) log with
+    match SeqProperties.find (fun mc -> snd mc = c) log with
     | Some mc -> fst mc
   else
     let iv,c' = split c ivsize in

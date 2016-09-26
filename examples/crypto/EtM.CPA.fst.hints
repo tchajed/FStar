@@ -291,7 +291,7 @@
         "equation_FStar.Monotonic.RRef.as_rref",
         "equation_FStar.Monotonic.RRef.m_sel", "equation_FStar.ST.modifies",
         "equation_FStar.ST.modifies_none",
-        "equation_FStar.SeqProperties.seq_find", "equation_FStar.Set.subset",
+        "equation_FStar.SeqProperties.find", "equation_FStar.Set.subset",
         "equation_Platform.Bytes.bytes", "equation_Platform.Bytes.length",
         "equation_Prims.eqtype", "equation_Prims.fst", "equation_Prims.nat",
         "equation_Prims.snd", "fuel_guarded_inversion_Prims.tuple2",
@@ -327,7 +327,7 @@
         "refinement_interpretation_Tm_refine_72887d09fd35f32a31d81bd2c622fcb3",
         "typing_EtM.CPA.Key.region", "typing_FStar.HyperHeap.mod_set",
         "typing_FStar.Map.concat", "typing_FStar.Map.contains",
-        "typing_FStar.Map.restrict", "typing_FStar.SeqProperties.seq_find",
+        "typing_FStar.Map.restrict", "typing_FStar.SeqProperties.find",
         "typing_FStar.Set.complement", "typing_FStar.Set.empty",
         "typing_Tm_abs_55d80dcd4f5229f81b3c81fafd55dab3"
       ],

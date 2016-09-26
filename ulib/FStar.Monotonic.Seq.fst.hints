@@ -116,7 +116,7 @@
       0
     ],
     [
-      "FStar.Monotonic.Seq.lemma_mem_snoc",
+      "FStar.Monotonic.Seq.mem_snoc",
       1,
       2,
       1,
@@ -507,7 +507,7 @@
         "equation_FStar.Monotonic.Seq.mem", "equation_Prims.eqtype",
         "equation_Prims.nat", "function_token_typing_Prims.nat",
         "haseqTm_refine_ba523126f67e00e7cd55f0b92f16681d",
-        "lemma_FStar.SeqProperties.seq_mem_k",
+        "lemma_FStar.SeqProperties.mem_index",
         "refinement_interpretation_Tm_refine_414d0a9f578ab0048252f8c8f552b99f",
         "refinement_interpretation_Tm_refine_c90e16742d2e633e32c657b87c3493b3"
       ],
@@ -548,7 +548,7 @@
         "equation_FStar.Monotonic.Seq.i_sel", "equation_Prims.eqtype",
         "equation_Prims.nat", "function_token_typing_Prims.nat",
         "haseqTm_refine_ba523126f67e00e7cd55f0b92f16681d",
-        "lemma_FStar.SeqProperties.seq_mem_k",
+        "lemma_FStar.SeqProperties.mem_index",
         "refinement_interpretation_Tm_refine_414d0a9f578ab0048252f8c8f552b99f",
         "refinement_interpretation_Tm_refine_a0b856754fe72de2b777653e3ff0a6df",
         "refinement_interpretation_Tm_refine_c90e16742d2e633e32c657b87c3493b3"

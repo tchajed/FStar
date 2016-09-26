@@ -2,7 +2,7 @@
   "U×x¦\u0012¹h\u000bMyâ×Ïçmn",
   [
     [
-      "FStar.SeqProperties.lemma_append_inj_l",
+      "FStar.SeqProperties.append_inj_l",
       1,
       0,
       0,
@@ -13,7 +13,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_l",
+      "FStar.SeqProperties.append_inj_l",
       2,
       0,
       0,
@@ -24,7 +24,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_l",
+      "FStar.SeqProperties.append_inj_l",
       3,
       0,
       0,
@@ -42,7 +42,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_r",
+      "FStar.SeqProperties.append_inj_r",
       1,
       0,
       0,
@@ -53,7 +53,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_r",
+      "FStar.SeqProperties.append_inj_r",
       2,
       0,
       0,
@@ -64,7 +64,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_r",
+      "FStar.SeqProperties.append_inj_r",
       3,
       0,
       0,
@@ -75,7 +75,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj_r",
+      "FStar.SeqProperties.append_inj_r",
       4,
       0,
       0,
@@ -157,7 +157,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj",
+      "FStar.SeqProperties.append_inj",
       1,
       0,
       0,
@@ -168,7 +168,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_append_inj",
+      "FStar.SeqProperties.append_inj",
       2,
       0,
       0,
@@ -178,9 +178,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.lemma_append_inj", 3, 0, 0, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.append_inj", 3, 0, 0, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.lemma_append_inj",
+      "FStar.SeqProperties.append_inj",
       4,
       0,
       0,
@@ -600,7 +600,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_mem_inversion",
+      "FStar.SeqProperties.mem_inversion",
       1,
       1,
       0,
@@ -608,7 +608,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_mem_inversion",
+      "FStar.SeqProperties.mem_inversion",
       2,
       1,
       0,
@@ -618,9 +618,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.lemma_mem_inversion", 3, 1, 0, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.mem_inversion", 3, 1, 0, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.lemma_mem_inversion",
+      "FStar.SeqProperties.mem_inversion",
       4,
       1,
       0,
@@ -646,9 +646,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.lemma_mem_count", 1, 1, 0, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.mem_count", 1, 1, 0, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.lemma_mem_count",
+      "FStar.SeqProperties.mem_count",
       2,
       1,
       0,
@@ -687,7 +687,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_mem_count",
+      "FStar.SeqProperties.mem_count",
       3,
       1,
       0,
@@ -695,7 +695,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_mem_count",
+      "FStar.SeqProperties.mem_count",
       4,
       1,
       0,
@@ -707,7 +707,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_count_slice",
+      "FStar.SeqProperties.count_slice",
       1,
       1,
       0,
@@ -715,7 +715,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_count_slice",
+      "FStar.SeqProperties.count_slice",
       2,
       1,
       0,
@@ -732,7 +732,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_count_slice",
+      "FStar.SeqProperties.count_slice",
       3,
       1,
       0,
@@ -920,7 +920,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux_frag_eq",
+      "FStar.SeqProperties.swap_permutes_aux_frag_eq",
       1,
       2,
       1,
@@ -943,7 +943,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux_frag_eq",
+      "FStar.SeqProperties.swap_permutes_aux_frag_eq",
       2,
       2,
       1,
@@ -977,7 +977,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux",
+      "FStar.SeqProperties.swap_permutes_aux",
       1,
       2,
       1,
@@ -988,7 +988,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux",
+      "FStar.SeqProperties.swap_permutes_aux",
       2,
       2,
       1,
@@ -999,7 +999,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux",
+      "FStar.SeqProperties.swap_permutes_aux",
       3,
       2,
       2,
@@ -1061,7 +1061,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_aux",
+      "FStar.SeqProperties.swap_permutes_aux",
       4,
       2,
       1,
@@ -1085,7 +1085,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes",
+      "FStar.SeqProperties.permutation_swap",
       1,
       0,
       1,
@@ -1096,7 +1096,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes",
+      "FStar.SeqProperties.permutation_swap",
       2,
       0,
       1,
@@ -1109,7 +1109,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes",
+      "FStar.SeqProperties.permutation_swap",
       3,
       0,
       1,
@@ -1119,9 +1119,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.cons_perm", 1, 1, 1, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.permutation_cons", 1, 1, 1, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.cons_perm",
+      "FStar.SeqProperties.permutation_cons",
       2,
       1,
       1,
@@ -1153,9 +1153,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.lemma_mem_append", 1, 2, 1, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.mem_append", 1, 2, 1, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.lemma_mem_append",
+      "FStar.SeqProperties.mem_append",
       2,
       2,
       1,
@@ -1321,7 +1321,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_ordering_lo_snoc",
+      "FStar.SeqProperties.ordering_lo_snoc",
       1,
       2,
       1,
@@ -1340,7 +1340,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_ordering_lo_snoc",
+      "FStar.SeqProperties.ordering_lo_snoc",
       2,
       2,
       1,
@@ -1384,7 +1384,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_ordering_hi_cons",
+      "FStar.SeqProperties.ordering_hi_cons",
       1,
       2,
       1,
@@ -1400,7 +1400,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_ordering_hi_cons",
+      "FStar.SeqProperties.ordering_hi_cons",
       2,
       2,
       1,
@@ -1603,7 +1603,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_slice_commute",
+      "FStar.SeqProperties.swap_slice_commute",
       1,
       0,
       1,
@@ -1626,7 +1626,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_slice_commute",
+      "FStar.SeqProperties.swap_slice_commute",
       2,
       0,
       1,
@@ -1659,7 +1659,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_slice",
+      "FStar.SeqProperties.permutation_slice",
       1,
       0,
       1,
@@ -1680,7 +1680,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_permutes_slice",
+      "FStar.SeqProperties.permutation_slice",
       2,
       0,
       1,
@@ -1769,7 +1769,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_splice",
+      "FStar.SeqProperties.splice_swap",
       1,
       0,
       1,
@@ -1789,7 +1789,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_swap_splice",
+      "FStar.SeqProperties.splice_swap",
       2,
       0,
       1,
@@ -1827,7 +1827,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_hi",
+      "FStar.SeqProperties.slice_splice_l",
       1,
       0,
       1,
@@ -1838,7 +1838,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_hi",
+      "FStar.SeqProperties.slice_splice_l",
       2,
       0,
       1,
@@ -1854,7 +1854,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_hi",
+      "FStar.SeqProperties.slice_splice_l",
       3,
       0,
       1,
@@ -1887,7 +1887,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_lo",
+      "FStar.SeqProperties.slice_splice_r",
       1,
       0,
       1,
@@ -1898,7 +1898,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_lo",
+      "FStar.SeqProperties.slice_splice_r",
       2,
       0,
       1,
@@ -1915,7 +1915,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_seq_frame_lo",
+      "FStar.SeqProperties.slice_splice_r",
       3,
       0,
       1,
@@ -1945,7 +1945,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_tail_slice",
+      "FStar.SeqProperties.tail_slice",
       1,
       0,
       1,
@@ -1963,7 +1963,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_tail_slice",
+      "FStar.SeqProperties.tail_slice",
       2,
       0,
       1,
@@ -1991,7 +1991,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_right",
+      "FStar.SeqProperties.splice_le_r",
       1,
       0,
       1,
@@ -2002,7 +2002,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_right",
+      "FStar.SeqProperties.splice_le_r",
       2,
       0,
       1,
@@ -2016,7 +2016,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_right",
+      "FStar.SeqProperties.splice_le_r",
       3,
       0,
       1,
@@ -2049,7 +2049,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_left",
+      "FStar.SeqProperties.splice_ge_l",
       1,
       0,
       1,
@@ -2060,7 +2060,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_left",
+      "FStar.SeqProperties.splice_ge_l",
       2,
       0,
       1,
@@ -2074,7 +2074,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_frame_left",
+      "FStar.SeqProperties.splice_ge_l",
       3,
       0,
       1,
@@ -2107,7 +2107,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_frame",
+      "FStar.SeqProperties.splice_trans",
       1,
       0,
       1,
@@ -2118,7 +2118,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_frame",
+      "FStar.SeqProperties.splice_trans",
       2,
       0,
       1,
@@ -2129,7 +2129,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_frame",
+      "FStar.SeqProperties.splice_trans",
       3,
       0,
       1,
@@ -2142,7 +2142,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_frame",
+      "FStar.SeqProperties.splice_trans",
       4,
       0,
       1,
@@ -2173,7 +2173,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_left",
+      "FStar.SeqProperties.permutation_slice_ge_l",
       1,
       0,
       1,
@@ -2184,7 +2184,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_left",
+      "FStar.SeqProperties.permutation_slice_ge_l",
       2,
       0,
       1,
@@ -2199,7 +2199,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_left",
+      "FStar.SeqProperties.permutation_slice_ge_l",
       3,
       0,
       1,
@@ -2233,7 +2233,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_right",
+      "FStar.SeqProperties.permutation_slice_le_r",
       1,
       0,
       1,
@@ -2244,7 +2244,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_right",
+      "FStar.SeqProperties.permutation_slice_le_r",
       2,
       0,
       1,
@@ -2259,7 +2259,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_weaken_perm_right",
+      "FStar.SeqProperties.permutation_slice_le_r",
       3,
       0,
       1,
@@ -2294,7 +2294,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_perm",
+      "FStar.SeqProperties.permutation_slice_trans",
       1,
       0,
       1,
@@ -2305,7 +2305,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_perm",
+      "FStar.SeqProperties.permutation_slice_trans",
       2,
       0,
       1,
@@ -2316,7 +2316,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_perm",
+      "FStar.SeqProperties.permutation_slice_trans",
       3,
       0,
       1,
@@ -2328,7 +2328,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_trans_perm",
+      "FStar.SeqProperties.permutation_slice_trans",
       4,
       0,
       1,
@@ -2344,7 +2344,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.lemma_mem_snoc",
+      "FStar.SeqProperties.mem_snoc",
       1,
       2,
       1,
@@ -2354,9 +2354,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.lemma_mem_snoc", 2, 2, 1, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.mem_snoc", 2, 2, 1, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.lemma_mem_snoc",
+      "FStar.SeqProperties.mem_snoc",
       3,
       2,
       1,
@@ -2391,7 +2391,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.seq_find_aux",
+      "FStar.SeqProperties.find_aux",
       1,
       0,
       1,
@@ -2403,7 +2403,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.seq_find_aux",
+      "FStar.SeqProperties.find_aux",
       2,
       0,
       1,
@@ -2435,7 +2435,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.seq_find",
+      "FStar.SeqProperties.find",
       1,
       0,
       1,
@@ -2447,7 +2447,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.seq_find",
+      "FStar.SeqProperties.find",
       2,
       0,
       1,
@@ -2457,9 +2457,9 @@
       ],
       0
     ],
-    [ "FStar.SeqProperties.seq_mem_k", 1, 1, 1, [ "@query" ], 0 ],
+    [ "FStar.SeqProperties.mem_index", 1, 1, 1, [ "@query" ], 0 ],
     [
-      "FStar.SeqProperties.seq_mem_k",
+      "FStar.SeqProperties.mem_index",
       2,
       1,
       1,
@@ -2500,7 +2500,7 @@
       0
     ],
     [
-      "FStar.SeqProperties.seq_mem_k",
+      "FStar.SeqProperties.mem_index",
       3,
       1,
       1,

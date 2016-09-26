@@ -40,7 +40,7 @@ val inj: a: text -> b: text -> Lemma (requires (equal (encode a) (encode b)))
 
 let inj a b = 
   if length a = length b
-  then lemma_append_inj a (pad (blocksize - length a)) b  (pad (blocksize - length a))
+  then append_inj a (pad (blocksize - length a)) b  (pad (blocksize - length a))
   else let aa = encode a in
        let bb = encode b in
        cut (index aa 31 <> index bb 31)

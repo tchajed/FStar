@@ -68,7 +68,7 @@ let rec partition #a f start len pivot back x =
   then
     begin
 (*ghost*)      (let s = sel h0 x in
-(*ghost*)       lemma_mem_slice_cons s pivot len;
+(*ghost*)       mem_slice_cons s pivot len;
 (*ghost*)       splice_refl s start len);
       pivot
     end
@@ -86,17 +86,17 @@ let rec partition #a f start len pivot back x =
 (* ghost *)           let s' = sel h1 x in
 (* ghost *)           swap_frame_lo s start pivot (pivot + 1);
 (* ghost *)           swap_frame_hi s pivot (pivot + 1) (back + 1) len;
-(* ghost *)           lemma_ordering_lo_snoc f s' start pivot p in
+(* ghost *)           ordering_lo_snoc f s' start pivot p in
           let res = partition f start len (pivot + 1) back x in
 	  let h2 = get () in	  		      
           let _ =     
 (* ghost *)           let s = sel h0 x in
 (* ghost *)           let s' = sel h1 x in	  
 (* ghost *)           let s'' = sel h2 x in
-(* ghost *)           lemma_swap_splice s start pivot (pivot + 1) len;
-(* ghost *)           lemma_trans_frame s'' s' s start len;
-(* ghost *)           lemma_swap_permutes_slice s start pivot (pivot + 1) len;
-(* ghost *)           lemma_trans_perm s s' s'' start len in
+(* ghost *)           splice_swap s start pivot (pivot + 1) len;
+(* ghost *)           splice_trans s'' s' s start len;
+(* ghost *)           permutation_slice s start pivot (pivot + 1) len;
+(* ghost *)           permutation_slice_trans s s' s'' start len in
           res
         end
       else
@@ -108,17 +108,17 @@ let rec partition #a f start len pivot back x =
 (* ghost *)           let s' = sel h1 x in
 (* ghost *)           swap_frame_lo' s start pivot (pivot + 1) back;
 (* ghost *)           swap_frame_hi s (pivot + 1) back (back + 1) len;
-(* ghost *)           lemma_ordering_hi_cons f s' back len p in
+(* ghost *)           ordering_hi_cons f s' back len p in
           let res = partition f start len pivot (back - 1) x in
 	  let h2 = get () in
 	  let _ = 
 (* ghost *)           let s = sel h0 x in	  
 (* ghost *)           let s' = sel h1 x in	  
 (* ghost *)           let s'' = sel h2 x in
-(* ghost *)           lemma_swap_splice s start (pivot + 1) back len;
-(* ghost *)           lemma_trans_frame s'' s' s start len;
-(* ghost *)           lemma_swap_permutes_slice s start (pivot + 1) back len;
-(* ghost *)           lemma_trans_perm s s' s'' start len in
+(* ghost *)           splice_swap s start (pivot + 1) back len;
+(* ghost *)           splice_trans s'' s' s start len;
+(* ghost *)           permutation_slice s start (pivot + 1) back len;
+(* ghost *)           permutation_slice_trans s s' s'' start len in
           res
         end
     end
@@ -158,26 +158,26 @@ let rec sort #a f i j x =
 
 (* ghost *)    let h2 = get() in
 	       let _ = 
-(* ghost *)      lemma_seq_frame_hi (sel h2 x) (sel h1 x) i pivot pivot j;
-(* ghost *)      lemma_tail_slice (sel h2 x) pivot j in
+(* ghost *)      slice_splice_l (sel h2 x) (sel h1 x) i pivot pivot j;
+(* ghost *)      tail_slice (sel h2 x) pivot j in
 
                sort f (pivot + 1) j x;
 
 (* ghost *)    let h3 = get() in
-(* ghost *)    lemma_seq_frame_lo (sel h3 x) (sel h2 x) i pivot (pivot + 1) j;
+(* ghost *)    slice_splice_r (sel h3 x) (sel h2 x) i pivot (pivot + 1) j;
 (* ghost *)    let lo = slice (sel h3 x) i pivot in
 (* ghost *)    let hi = slice (sel h3 x) (pivot + 1) j in
 (* ghost *)    let pv = index (sel h1 x) pivot in
-(* ghost *)    SeqProperties.lemma_sorted_append_cons f lo pv hi;
+(* ghost *)    SeqProperties.sorted_append_cons f lo pv hi;
 (* ghost *)    lemma_slice_cons_pv (sel h3 x) i pivot j pv;
 
-(* ghost *)    lemma_weaken_frame_right (sel h2 x) (sel h1 x) i pivot j;
-(* ghost *)    lemma_weaken_frame_left (sel h3 x) (sel h2 x) i (pivot + 1) j;
-(* ghost *)    lemma_trans_frame (sel h3 x) (sel h2 x) (sel h1 x) i j;
-(* ghost *)    lemma_trans_frame (sel h3 x) (sel h1 x) (sel h0 x) i j;
+(* ghost *)    splice_le_r (sel h2 x) (sel h1 x) i pivot j;
+(* ghost *)    splice_ge_l (sel h3 x) (sel h2 x) i (pivot + 1) j;
+(* ghost *)    splice_trans (sel h3 x) (sel h2 x) (sel h1 x) i j;
+(* ghost *)    splice_trans (sel h3 x) (sel h1 x) (sel h0 x) i j;
 
-(* ghost *)    lemma_weaken_perm_right (sel h2 x) (sel h1 x) i pivot j;
-(* ghost *)    lemma_weaken_perm_left (sel h3 x) (sel h2 x) i (pivot + 1) j
+(* ghost *)    permutation_slice_le_r (sel h2 x) (sel h1 x) i pivot j;
+(* ghost *)    permutation_slice_ge_l (sel h3 x) (sel h2 x) i (pivot + 1) j
   end
 
 

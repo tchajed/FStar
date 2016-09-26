@@ -29,20 +29,20 @@ val partition: #a:eqtype -> f:(a -> a -> Tot bool){total_order a f}
          (decreases (back - pivot))
 let rec partition #a f s pivot back =
   if pivot=back
-  then (lemma_count_slice s pivot;
+  then (count_slice s pivot;
         let lo = slice s 0 pivot in
         let hi = slice s pivot (length s) in
-        lemma_mem_count lo (fun x -> f x (index s pivot));
-        lemma_mem_count hi (f (index s pivot));
+        mem_count lo (fun x -> f x (index s pivot));
+        mem_count hi (f (index s pivot));
         (lo, hi))
   else let next = index s (pivot + 1) in
        let p = index s pivot in
        if f next p
        then let s' = swap s pivot (pivot + 1) in  (* the pivot moves forward *)
-            let _ = lemma_swap_permutes s pivot (pivot + 1) in
+            let _ = permutation_swap s pivot (pivot + 1) in
             partition f s' (pivot + 1) back
        else let s' = swap s (pivot + 1) back in (* the back moves backward *)
-            let _ = lemma_swap_permutes s (pivot + 1) back in
+            let _ = permutation_swap s (pivot + 1) back in
             let res = (* admit() *) partition f s' pivot (back - 1) in
             res        
 
@@ -64,9 +64,9 @@ let rec sort #a f s =
 
        let result = Seq.append l (cons pivot h) in
 
-       lemma_sorted_append_cons f l pivot h;
-       lemma_count_append l (cons pivot h);
-       cons_perm h hi;
+       sorted_append_cons f l pivot h;
+       count_append l (cons pivot h);
+       permutation_cons h hi;
 
        result
 

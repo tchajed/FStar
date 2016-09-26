@@ -204,7 +204,7 @@ val lemma_pad_0_injective: b0:Seq.seq UInt8.t -> b1:Seq.seq UInt8.t -> l:nat -> 
   (requires (pad_0 b0 l == pad_0 b1 l))
   (ensures  (b0 == b1))
 let lemma_pad_0_injective b0 b1 l =
-  SeqProperties.lemma_append_inj b0 (Seq.create l 0uy) b1 (Seq.create l 0uy);
+  SeqProperties.append_inj b0 (Seq.create l 0uy) b1 (Seq.create l 0uy);
   Seq.eq_intro b0 b1
 
 val lemma_encode_16_injective: w0:word_16 -> w1:word_16 -> Lemma
@@ -234,7 +234,7 @@ let rec lemma_encode_pad_injective p0 t0 p1 t1 =
     begin
     let w0 = pad_0 t0 (16 - l) in
     let w1 = pad_0 t1 (16 - l) in
-    SeqProperties.lemma_append_inj
+    SeqProperties.append_inj
       p0 (Seq.create 1 (encode_16 w0))
       p1 (Seq.create 1 (encode_16 w1));
     index_create 1 (encode_16 w0) 0;
@@ -249,7 +249,7 @@ let rec lemma_encode_pad_injective p0 t0 p1 t1 =
     let p1' = SeqProperties.snoc p1 (encode_16 w1) in
     assert (encode_pad p0' t0' == encode_pad p1' t1');
     lemma_encode_pad_injective p0' t0' p1' t1';
-    SeqProperties.lemma_append_inj
+    SeqProperties.append_inj
       p0 (Seq.create 1 (encode_16 w0))
       p1 (Seq.create 1 (encode_16 w1));
     index_create 1 (encode_16 w0) 0;

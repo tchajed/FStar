@@ -148,7 +148,7 @@ let rec refines h i entries blocks =
       refines h i entries blocks 
     end
 
-let lookupIV (i:id) (s:Seq.seq (entry i)) = Seq.seq_find (fun e:entry i -> e.iv = iv) s
+let lookupIV (i:id) (s:Seq.seq (entry i)) = Seq.SeqProperties.find (fun e:entry i -> e.iv = iv) s
 *)
 
 

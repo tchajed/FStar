@@ -5317,7 +5317,7 @@ hide whether it was `m` or a string of `0z`s that was encrypted:
 let decrypt k c =
   if ind_cpa_rest_adv then
     let log = m_read k.log in
-    match seq_find (fun mc -> snd mc = c) log with
+    match SeqProperties.find (fun mc -> snd mc = c) log with
     | Some mc -> fst mc
   else
     let iv,c' = split c ivsize in
@@ -5333,7 +5333,7 @@ This can be expressed as a stateful precondition for `decrypt`:
 ```
 val decrypt: k:key -> c:cipher -> ST msg
   (requires (fun h0 ->
-    ( (b2t ind_cpa_rest_adv) ==> is_Some (seq_find (fun mc -> snd mc = c) (get_log h0 k) ))))
+    ( (b2t ind_cpa_rest_adv) ==> is_Some (SeqProperties.find (fun mc -> snd mc = c) (get_log h0 k) ))))
 ```
 where function `get_log` retrives `k.log` as stored in heap `h0`.
 

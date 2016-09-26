@@ -80,7 +80,7 @@ let otpRange rgn i (x:domain{x.ctr <> 0ul}) (v:range rgn i x) : otp i        = v
 noeq type entry (rgn:region) (i:id) = | Entry: x:domain -> range:range rgn i x -> entry rgn i
 
 let find (#rgn:region) (#i:id) (s:Seq.seq (entry rgn i)) (x:domain) : option (range rgn i x) =
-  match SeqProperties.seq_find (fun (e:entry rgn i) -> e.x = x) s with 
+  match SeqProperties.find (fun (e:entry rgn i) -> e.x = x) s with 
   | Some e -> Some e.range 
   | None   -> None
 
