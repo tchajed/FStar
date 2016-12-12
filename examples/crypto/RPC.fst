@@ -9,8 +9,6 @@ open FStar.IO
 let init_print = print_string "\ninitializing...\n\n"
 
 open Platform.Bytes
-(*open Seq
-open SeqProperties*)
 open SHA1
 open Formatting
 open MAC
