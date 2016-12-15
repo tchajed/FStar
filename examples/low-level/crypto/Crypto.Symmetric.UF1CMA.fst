@@ -487,7 +487,7 @@ val verify:
   (ensures (fun h0 b h1 -> verify_ensures st acc tag h0 b h1))
 
 // for RR.witness below
-#set-options "--initial_ifuel 1 --max_ifuel 1"
+#set-options "--initial_ifuel 1 --max_ifuel 1 --z3rlimit 200"
 
 let verify #i st acc tag =
   let h0 = ST.get () in

@@ -365,6 +365,8 @@ let pre_refines_to_refines i st nonce aadlen aad len plain cipher h0 h
 (*** Some basic sanity checks 
      on the `refines` invariant ***)
 
+#set-options "--z3rlimit 200  --max_fuel 2"
+
 (* 1. empty refines empty *)
 private let refines_empty (h:mem) (i:id{safeId i}) (rgn:region) 
   : Lemma (refines h i rgn Seq.createEmpty Seq.createEmpty)
