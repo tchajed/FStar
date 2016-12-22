@@ -5,9 +5,9 @@ UNAME?=$(shell uname | cut -c 1-6)
 ifeq ($(UNAME),CYGWIN)
   CC=$(MARCH)-w64-mingw32-gcc
 else ifeq ($(MARCH),i686)
-  CC=gcc -m32
+  CC=gcc-6 -m32
 else
-  CC=gcc
+  CC=gcc-6 
 endif
 
 ifeq ($(UNAME),Darwin)
