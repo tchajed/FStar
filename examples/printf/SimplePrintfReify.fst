@@ -107,9 +107,9 @@ reifiable let rec parse_format (s:list char) : Xex (list dir) =
             | 'c' -> Arg Char
             | 's' -> Arg String
             | _   -> XEXN?.raise dir InvalidFormatString
-    in let x = parse_format s' in d :: x
+    in d :: parse_format s'
   | '%' :: [] -> XEXN?.raise (list dir) InvalidFormatString
-  | c :: s' -> let x = parse_format s' in Lit c :: x
+  | c :: s' -> Lit c :: parse_format s'
 
 let parse_format_pure (s:list char) : option (list dir) =
   reify (parse_format s) ()
@@ -121,22 +121,25 @@ let sprintf (s:string{Some? (parse_format_string s)})
   : Tot (dir_type (Some?.v (parse_format_string s))) =
   string_of_dirs (Some?.v (parse_format_string s)) (fun s -> s)
 
-let example_error_lemma () :
-  Lemma (parse_format_pure ['%'] == None) =
-  assert_norm (parse_format_pure ['%'] == None)
 
-let example3_lemma () :
-  Lemma (parse_format_pure ['%'; 'd'; '='; '%'; 's']
-         == Some [Arg Int; Lit '='; Arg String]) =
-  assert_norm (parse_format_pure ['%'; 'd'; '='; '%'; 's']
-               == Some [Arg Int; Lit '='; Arg String])
+let xxx = parse_format_pure ['%'; 'd'; '='; '%'; 's']
 
-let example4_lemma () :
-  Lemma (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String]) =
-  assert_norm (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String])
+(* let example_error_lemma () : *)
+(*   Lemma (parse_format_pure ['%'] == None) = *)
+(*   assert_norm (parse_format_pure ['%'] == None) *)
 
-let example5 : string =
-  (* Requiring such an assert_norm on each usage seems quite bad for usability *)
-  assert_norm (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String]);
-  (sprintf "%d=%s" <: int -> string -> Tot string) 42 " answer"
-  (* We also requires a pesky type annotation, but that seems more acceptable *)
+(* let example3_lemma () : *)
+(*   Lemma (parse_format_pure ['%'; 'd'; '='; '%'; 's'] *)
+(*          == Some [Arg Int; Lit '='; Arg String]) = *)
+(*   assert_norm (parse_format_pure ['%'; 'd'; '='; '%'; 's'] *)
+(*                == Some [Arg Int; Lit '='; Arg String]) *)
+
+(* let example4_lemma () : *)
+(*   Lemma (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String]) = *)
+(*   assert_norm (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String]) *)
+
+(* let example5 : string = *)
+(*   (\* Requiring such an assert_norm on each usage seems quite bad for usability *\) *)
+(*   assert_norm (parse_format_string "%d=%s" == Some [Arg Int; Lit '='; Arg String]); *)
+(*   (sprintf "%d=%s" <: int -> string -> Tot string) 42 " answer" *)
+(*   (\* We also requires a pesky type annotation, but that seems more acceptable *\) *)

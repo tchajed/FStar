@@ -639,10 +639,11 @@ let get_norm_request args =
 let rec norm : cfg -> env -> stack -> term -> term =
     fun cfg env stack t ->
         let t = compress t in
+        let firstn k l = if List.length l < k then l,[] else first_N k l in
         log cfg  (fun () -> Util.print3 ">>> %s\nNorm %s with top of the stack %s \n"
                                         (Print.tag_of_term t)
                                         (Print.term_to_string t)
-                                        (stack_to_string (fst <| first_N 4 stack)));
+                                        (stack_to_string (fst <| firstn 4 stack)));
         match t.n with
           | Tm_delayed _ ->
             failwith "Impossible"
@@ -1047,26 +1048,29 @@ let rec norm : cfg -> env -> stack -> term -> term =
                                                        | Some true -> body
                                             end
                                         | (e,q) :: es ->
-                                            begin match (SS.compress e).n with
-                                                | Tm_meta (e0, Meta_monadic_lift(m1, m2, t')) when not (Syntax.Util.is_pure_effect m1)->
+                                            let hoist_and_bind e m t' =
                                                     let x = S.gen_bv "monadic_app_var" None t' in
                                                     let body = bind_on_lift es ((S.bv_to_name x, q)::acc) in
-                                                    (* bind t' t _ (lift e) _ (fun x -> body) *)
-                                                    let lifted_e0 = reify_lift cfg.tcenv e0 m1 m2 t' in
+                                                    (* bind t' t _ (reify e) _ (fun x -> body) *)
                                                     (* TODO : what about qualifiers !!! (should they be brought by the meta annotation ?)*)
-                                                    let continuation = U.abs [x,None] body (Some (Inr (m2, []))) in
+                                                    let continuation = U.abs [x,None] body (Some (Inr (m, []))) in
                                                     let bind_inst = match (SS.compress bind_repr).n with
                                                         | Tm_uinst (bind, [_ ; _]) ->
                                                             S.mk (Tm_uinst (bind, [cfg.tcenv.universe_of cfg.tcenv t'
                                                                                    ; cfg.tcenv.universe_of cfg.tcenv t]))
-                                                            None e0.pos
+                                                            None e.pos
                                                         | _ -> failwith "NIY : Reification of indexed effects"
                                                     in
                                                     S.mk (Tm_app (bind_inst, [as_arg t'; as_arg t ;
-                                                                              as_arg S.tun; as_arg lifted_e0;
+                                                                              as_arg S.tun; as_arg e;
                                                                               as_arg S.tun; as_arg continuation ]))
-                                                    None e0.pos
-                                                    (* Tm_meta(_, Meta_monadic _) should not appear here *)
+                                                    None e.pos
+                                            in
+                                            begin match (SS.compress e).n with
+                                                | Tm_meta (e0, Meta_monadic(m, t')) -> hoist_and_bind (mk_reify e) m t'
+                                                | Tm_meta (e0, Meta_monadic_lift(m1, m2, t')) when not (Syntax.Util.is_pure_effect m1)->
+                                                    let lifted_e0 = reify_lift cfg.tcenv e0 m1 m2 t' in
+                                                    hoist_and_bind lifted_e0 m2 t'
                                                 | Tm_meta (e0, Meta_monadic_lift _) -> bind_on_lift es ((e0,q)::acc)
                                                 | _ -> bind_on_lift es ((e,q)::acc)
                                             end
