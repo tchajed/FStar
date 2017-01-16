@@ -429,12 +429,14 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
                   else check_application_args env head chead g_head args (Env.expected_typ env0) in
     if Env.debug env Options.Extreme
     then Util.print1 "Introduced {%s} implicits in application\n" (Rel.print_pending_implicits g);
-    let c = if Env.should_verify env
-            && not (Util.is_lcomp_partial_return c)
-            //&& not (Util.is_unit c.res_typ)
-            && Util.is_pure_or_ghost_lcomp c //ADD_EQ_REFINEMENT for pure applications
-            then TcUtil.maybe_assume_result_eq_pure_term env e c
-            else c in
+    let c =
+      if Env.should_verify env &&
+         not (Util.is_lcomp_partial_return c) &&
+         //not (Util.is_unit c.res_typ) &&
+         Util.is_pure_or_ghost_lcomp c //ADD_EQ_REFINEMENT for pure applications
+      then TcUtil.maybe_assume_result_eq_pure_term env e c
+      else c
+    in
     let e, c, g' = comp_check_expected_typ env0 e c in
     let gimp =
         match (SS.compress head).n with
@@ -468,11 +470,14 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
     let c_branches, g_branches =
       let cases, g = List.fold_right (fun (_, f, c, g) (caccum, gaccum) ->
         (f, c)::caccum, Rel.conj_guard g gaccum) t_eqns ([], Rel.trivial_guard) in
-      TcUtil.bind_cases env res_t cases, g in (* bind_cases adds an exhaustiveness check *)
+      (* bind_cases adds an exhaustiveness check *)
+      TcUtil.bind_cases env res_t cases, g
+    in
 
     let cres = TcUtil.bind e1.pos env (Some e1) c1 (Some guard_x, c_branches) in
     let e =
         let mk_match scrutinee =
+            (* TODO (KM) : I have the impression that lifting here is useless/wrong : the scrutinee should always be pure... *)
             let scrutinee = TypeChecker.Util.maybe_lift env scrutinee c1.eff_name cres.eff_name c1.res_typ in
             let branches = t_eqns |> List.map (fun ((pat, wopt, br), _, lc, _) ->
                  (pat, wopt, TypeChecker.Util.maybe_lift env br lc.eff_name cres.eff_name lc.res_typ )) in
@@ -1243,7 +1248,8 @@ and tc_eqn scrutinee env branch
         //explicitly return e here, not its normal form, since pattern decoration relies on it
         e,e') |> List.unzip in
     let p = TcUtil.decorate_pattern env p exps in
-    p, pat_bvs, pat_env, exps, norm_exps in
+    p, pat_bvs, pat_env, exps, norm_exps
+  in
   (*</tc_pat>*)
 
   let pat_t = scrutinee.sort in
@@ -1280,8 +1286,8 @@ and tc_eqn scrutinee env branch
 
     (* (a) eqs are equalities between the scrutinee and the pattern *)
     let eqs =
-        if not (Env.should_verify env) 
-        then None 
+        if not (Env.should_verify env)
+        then None
         else disj_exps |> List.fold_left (fun fopt e ->
                 let e = SS.compress e in
                 match e.n with
@@ -1328,7 +1334,8 @@ and tc_eqn scrutinee env branch
     let binders = List.map S.mk_binder pat_bvs in
     TcUtil.close_comp env pat_bvs c_weak,
     Rel.close_guard binders g_when_weak,
-    g_branch in
+    g_branch
+  in
 
   (* 6. Building the guard for this branch;                                                             *)
   (*        the caller assembles the guards for each branch into an exhaustiveness check.               *)
@@ -1344,8 +1351,8 @@ and tc_eqn scrutinee env branch
   (*                                                                                                    *)
   (* (d) Strengthen 6 (c) with the when condition, if there is one                                      *)
   let branch_guard =
-      if not (Env.should_verify env) 
-      then Util.t_true 
+      if not (Env.should_verify env)
+      then Util.t_true
       else (* 6 (a) *)
           let rec build_branch_guard scrutinee_tm pat_exp : list<typ> =
             let discriminate scrutinee_tm f =
@@ -1398,7 +1405,7 @@ and tc_eqn scrutinee env branch
                                 build_branch_guard sub_term ei) |> List.flatten in
                          discriminate scrutinee_tm f @ sub_term_guards
                 | _ -> [] //a non-pattern sub-term: must be from a dot pattern
-          in 
+          in
 
           (* 6 (b) *)
           let build_and_check_branch_guard scrutinee_tm pat =
@@ -1417,7 +1424,7 @@ and tc_eqn scrutinee env branch
             | None -> branch_guard
             | Some w -> Util.mk_conj branch_guard w in
 
-          branch_guard 
+          branch_guard
   in
 
   let guard = Rel.conj_guard g_when g_branch in
@@ -1852,11 +1859,11 @@ let universe_or_type_of env e =
           S.mk t None e.pos in
       universe_of_type e <| N.normalize [N.Beta; N.UnfoldUntil Delta_constant] env t
 
-let universe_of env e = 
-   match universe_or_type_of env e with 
-   | Inl t -> 
-     raise (Error(Util.format2 "Expected a term of type 'Type'; got %s : %s" 
-                        (Print.term_to_string e) 
-                        (Print.term_to_string t), 
+let universe_of env e =
+   match universe_or_type_of env e with
+   | Inl t ->
+     raise (Error(Util.format2 "Expected a term of type 'Type'; got %s : %s"
+                        (Print.term_to_string e)
+                        (Print.term_to_string t),
                   Env.get_range env))
    | Inr u -> u
