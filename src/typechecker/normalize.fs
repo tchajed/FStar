@@ -1033,51 +1033,15 @@ let rec norm : cfg -> env -> stack -> term -> term =
                                           end
                                 in
 
-                                let rec bind_on_lift args acc =
-                                    match args with
-                                        | [] ->
-                                            begin match List.rev acc with
-                                               | [] -> failwith "bind_on_lift should be always called with a non-empty list"
-                                               | (head, _) :: args ->
-                                                   let head, found_action = maybe_unfold_action head in
-                                                   let mk tm = S.mk tm None t.pos in
-                                                   let body = mk (Tm_app(head, args)) in
-                                                   match found_action with
-                                                       | None -> U.mk_reify body
-                                                       | Some false -> mk (Tm_meta (body, Meta_monadic(m, t)))
-                                                       | Some true -> body
-                                            end
-                                        | (e,q) :: es ->
-                                            let hoist_and_bind e m t' =
-                                                    let x = S.gen_bv "monadic_app_var" None t' in
-                                                    let body = bind_on_lift es ((S.bv_to_name x, q)::acc) in
-                                                    (* bind t' t _ (reify e) _ (fun x -> body) *)
-                                                    (* TODO : what about qualifiers !!! (should they be brought by the meta annotation ?)*)
-                                                    let continuation = U.abs [x,None] body (Some (Inr (m, []))) in
-                                                    let bind_inst = match (SS.compress bind_repr).n with
-                                                        | Tm_uinst (bind, [_ ; _]) ->
-                                                            S.mk (Tm_uinst (bind, [cfg.tcenv.universe_of cfg.tcenv t'
-                                                                                   ; cfg.tcenv.universe_of cfg.tcenv t]))
-                                                            None e.pos
-                                                        | _ -> failwith "NIY : Reification of indexed effects"
-                                                    in
-                                                    S.mk (Tm_app (bind_inst, [as_arg t'; as_arg t ;
-                                                                              as_arg S.tun; as_arg e;
-                                                                              as_arg S.tun; as_arg continuation ]))
-                                                    None e.pos
-                                            in
-                                            begin match (SS.compress e).n with
-                                                | Tm_meta (e0, Meta_monadic(m, t')) -> hoist_and_bind (mk_reify e) m t'
-                                                | Tm_meta (e0, Meta_monadic_lift(m1, m2, t')) when not (Syntax.Util.is_pure_effect m1)->
-                                                    let lifted_e0 = reify_lift cfg.tcenv e0 m1 m2 t' in
-                                                    hoist_and_bind lifted_e0 m2 t'
-                                                | Tm_meta (e0, Meta_monadic_lift _) -> bind_on_lift es ((e0,q)::acc)
-                                                | _ -> bind_on_lift es ((e,q)::acc)
-                                            end
+                                let head, found_action = maybe_unfold_action head in
+                                let body = S.mk_Tm_app head args None t.pos in
+                                let body = match found_action with
+                                    | None -> U.mk_reify body
+                                    | Some false ->
+                                        S.mk (Tm_meta (body, Meta_monadic(m, t))) None t.pos
+                                    | Some true -> body
                                 in
-                                let binded_head = bind_on_lift ((as_arg head)::args) [] in
-                                // Util.print1_warning "BEFORE NORMALIZING MONADIC APP : %s\n" (Print.term_to_string binded_head);
-                                norm cfg env (List.tl stack) binded_head
+                                norm cfg env (List.tl stack) head
                             | Tm_meta(e, Meta_monadic_lift (msrc, mtgt, t')) ->
                                 let lifted = reify_lift cfg.tcenv e msrc mtgt t' in
                                 norm cfg env stack lifted

@@ -476,29 +476,31 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
 
     let cres = TcUtil.bind e1.pos env (Some e1) c1 (Some guard_x, c_branches) in
     let e =
-        let mk_match scrutinee =
-            (* TODO (KM) : I have the impression that lifting here is useless/wrong : the scrutinee should always be pure... *)
-            let scrutinee = TypeChecker.Util.maybe_lift env scrutinee c1.eff_name cres.eff_name c1.res_typ in
-            let branches = t_eqns |> List.map (fun ((pat, wopt, br), _, lc, _) ->
-                 (pat, wopt, TypeChecker.Util.maybe_lift env br lc.eff_name cres.eff_name lc.res_typ )) in
-            let e = mk (Tm_match(scrutinee, branches)) (Some cres.res_typ.n) top.pos in
-             //The ascription with the result type is useful for re-checking a term, translating it to Lean etc.
-            mk (Tm_ascribed(e, Inl cres.res_typ, Some cres.eff_name)) None e.pos in
-        //see issue #594: if the scrutinee is impure, then explicitly sequence it with an impure let binding
-        //                to protect it from the normalizer optimizing it away
-        if TypeChecker.Util.is_pure_or_ghost_effect env c1.eff_name
-        then mk_match e1
-        else //generate a let binding for e1
-             let e_match = mk_match (S.bv_to_name guard_x) in
-             let lb = {
-                lbname=Inl guard_x;
-                lbunivs=[];
-                lbtyp=c1.res_typ;
-                lbeff=Env.norm_eff_name env c1.eff_name;
-                lbdef=e1;
-             } in
-             let e = mk (Tm_let((false, [lb]), SS.close [S.mk_binder guard_x] e_match)) (Some cres.res_typ.n) top.pos in
-             TypeChecker.Util.maybe_monadic env e cres.eff_name cres.res_typ in
+      let mk_match scrutinee =
+        (* TODO (KM) : I have the impression that lifting here is useless/wrong : the scrutinee should always be pure... *)
+        (* let scrutinee = TypeChecker.Util.maybe_lift env scrutinee c1.eff_name cres.eff_name c1.res_typ in *)
+        let branches = t_eqns |> List.map (fun ((pat, wopt, br), _, lc, _) ->
+              (pat, wopt, TypeChecker.Util.maybe_lift env br lc.eff_name cres.eff_name lc.res_typ )) in
+        let e = mk (Tm_match(scrutinee, branches)) (Some cres.res_typ.n) top.pos in
+          //The ascription with the result type is useful for re-checking a term, translating it to Lean etc.
+        mk (Tm_ascribed(e, Inl cres.res_typ, Some cres.eff_name)) None e.pos
+      in
+      //see issue #594: if the scrutinee is impure, then explicitly sequence it with an impure let binding
+      //                to protect it from the normalizer optimizing it away
+      if TypeChecker.Util.is_pure_or_ghost_effect env c1.eff_name
+      then mk_match e1
+      else //generate a let binding for e1
+        let e_match = mk_match (S.bv_to_name guard_x) in
+        let lb = {
+          lbname=Inl guard_x;
+          lbunivs=[];
+          lbtyp=c1.res_typ;
+          lbeff=Env.norm_eff_name env c1.eff_name;
+          lbdef=e1;
+        } in
+        let e = mk (Tm_let((false, [lb]), SS.close [S.mk_binder guard_x] e_match)) (Some cres.res_typ.n) top.pos in
+        TypeChecker.Util.maybe_monadic env e cres.eff_name cres.res_typ
+    in
     if debug env Options.Extreme
     then Util.print2 "(%s) comp type = %s\n"
                       (Range.string_of_range top.pos) (Print.comp_to_string <| cres.comp());
@@ -1006,26 +1008,63 @@ and check_application_args env head chead ghead args expected_topt : term * lcom
 
             | _ ->  (* partial app *)
                 let g = Rel.conj_guard ghead guard |> Rel.solve_deferred_constraints env in
-                U.lcomp_of_comp <| mk_Total  (SS.subst subst <| Util.arrow bs (cres.comp())), g in
+                U.lcomp_of_comp <| mk_Total  (SS.subst subst <| Util.arrow bs (cres.comp())), g
+        in
         if debug env Options.Low then Util.print1 "\t Type of result cres is %s\n" (Print.lcomp_to_string cres);
         //Note: The outargs are in reverse order. e.g., f e1 e2 e3, we have outargs = [(e3, _, c3); (e2; _; c2); (e1; _; c2)]
         //We build bind chead (bind c1 (bind c2 (bind c3 cres)))
-        let args, comp, monadic = List.fold_left (fun (args, out_c, monadic) ((e, q), x, c) ->
-                    match c with
-                    | Inl (eff_name, arg_typ) ->
-                      (TcUtil.maybe_lift env e eff_name out_c.eff_name arg_typ, q)::args, out_c, monadic
+        let args, comp, monadic =
+          List.fold_left (fun (args, out_c, monadic) ((e, q), x, c) ->
+            match c with
+            | Inl (eff_name, arg_typ) ->
+              (TcUtil.maybe_lift env e eff_name out_c.eff_name arg_typ, q)::args, out_c, monadic
 
-                    | Inr c ->
-                        let monadic = monadic || not (Util.is_pure_or_ghost_lcomp c) in
-                        let out_c =
-                            TcUtil.bind e.pos env None  //proving (Some e) here instead of None causes significant Z3 overhead
-                                        c (x, out_c) in
-                        let e = TcUtil.maybe_monadic env e c.eff_name c.res_typ in
-                        let e = TcUtil.maybe_lift env e c.eff_name out_c.eff_name c.res_typ in
-                        (e, q)::args, out_c, monadic) ([], cres, false) arg_comps_rev in
+            | Inr c ->
+              let monadic = monadic || not (Util.is_pure_or_ghost_lcomp c) in
+              let out_c =
+                  TcUtil.bind e.pos env None  //proving (Some e) here instead of None causes significant Z3 overhead
+                              c (x, out_c) in
+              (* TODO (KM) : Why would we need both a lift and a monadic tag ? *)
+              let e = TcUtil.maybe_lift env e c.eff_name out_c.eff_name c.res_typ in
+              let e = TcUtil.maybe_monadic env e c.eff_name c.res_typ in
+              (e, q)::args, out_c, monadic)
+            ([], cres, false)
+            arg_comps_rev
+        in
         let comp = TcUtil.bind head.pos env None chead (None, comp) in
-        let app =  mk_Tm_app head args (Some comp.res_typ.n) r in
-        let app = if monadic || not (Util.is_pure_or_ghost_lcomp comp) then TypeChecker.Util.maybe_monadic env app comp.eff_name comp.res_typ else app in
+        (* We elaborate monadic applications to a serie of let-binding so that *)
+        let rec letbind_on_lift args acc =
+          match args with
+          | [] ->
+              begin match List.rev acc with
+              | [] -> failwith "letbind_on_lift should be always called with a non-empty list"
+              | (head, _) :: args ->
+                  let body = mk_Tm_app head args (Some comp.res_typ.n) r in
+                  if monadic || not (Util.is_pure_or_ghost_lcomp comp)
+                  (* TODO (KM) : a lift may be necessary here *)
+                  (* TODO (KM) : inverting comp.eff_name and cres.eff_name results in a lifting in the wrong direction *)
+                  then
+                    (* TODO (KM) : Why would we need both a lift and a monadic tag ? *)
+                    let body =
+                      TcUtil.maybe_lift env body cres.eff_name comp.eff_name comp.res_typ
+                    in TcUtil.maybe_monadic env body comp.eff_name comp.res_typ
+                  else body
+              end
+          | (e,q) :: es ->
+              let hoist_and_bind e m t' =
+                let x = S.gen_bv "monadic_app_var" None t' in
+                let body = letbind_on_lift es ((S.bv_to_name x, q)::acc) in
+                let lb = Util.mk_letbinding (Inl x) [] t' m e in
+                mk (Tm_let ((false, [lb]), SS.close [S.mk_binder x] body)) None e.pos
+              in
+              begin match (SS.compress e).n with
+              | Tm_meta (e0, Meta_monadic(m, t'))
+              | Tm_meta (e0, Meta_monadic_lift(_, m, t')) ->
+                  hoist_and_bind e m t'
+              | _ -> letbind_on_lift es ((e,q)::acc)
+              end
+        in
+        let app = letbind_on_lift (as_arg head :: args) [] in
         let comp, g = TcUtil.strengthen_precondition None env app comp guard in //Each conjunct in g is already labeled
         app, comp, g
     in
