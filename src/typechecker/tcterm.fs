@@ -364,13 +364,15 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
     then Errors.warn e.pos "Qualifier on argument to reify is irrelevant and will be ignored";
     let e, c, g =
         let env0, _ = Env.clear_expected_typ env in
-        tc_term env0 e in
+        tc_term env0 e
+    in
     let reify_op, _ = Util.head_and_args top in
     let u_c =
         let _, c, _ = tc_term env c.res_typ in
         match (SS.compress c.res_typ).n with
         | Tm_type u -> u
-        | _ -> failwith "Unexpected result type of computation" in
+        | _ -> failwith "Unexpected result type of computation"
+    in
     let repr = TcUtil.reify_comp env c u_c in
     let e = mk (Tm_app(reify_op, [(e, aqual)])) (Some repr.n) top.pos in
     let c = S.mk_Total repr |> Util.lcomp_of_comp in
@@ -1032,7 +1034,7 @@ and check_application_args env head chead ghead args expected_topt : term * lcom
             arg_comps_rev
         in
         let comp = TcUtil.bind head.pos env None chead (None, comp) in
-        (* We elaborate monadic applications to a serie of let-binding so that *)
+        (* We elaborate monadic applications to a serie of monadic let-bindings *)
         let rec letbind_on_lift args acc =
           match args with
           | [] ->
@@ -1040,22 +1042,16 @@ and check_application_args env head chead ghead args expected_topt : term * lcom
               | [] -> failwith "letbind_on_lift should be always called with a non-empty list"
               | (head, _) :: args ->
                   let body = mk_Tm_app head args (Some comp.res_typ.n) r in
-                  if monadic || not (Util.is_pure_or_ghost_lcomp comp)
-                  (* TODO (KM) : a lift may be necessary here *)
-                  (* TODO (KM) : inverting comp.eff_name and cres.eff_name results in a lifting in the wrong direction *)
-                  then
-                    (* TODO (KM) : Why would we need both a lift and a monadic tag ? *)
-                    let body =
-                      TcUtil.maybe_lift env body cres.eff_name comp.eff_name comp.res_typ
-                    in TcUtil.maybe_monadic env body comp.eff_name comp.res_typ
-                  else body
+                  let body = TcUtil.maybe_lift env body cres.eff_name comp.eff_name comp.res_typ in
+                  TcUtil.maybe_monadic env body comp.eff_name comp.res_typ
               end
           | (e,q) :: es ->
               let hoist_and_bind e m t' =
                 let x = S.gen_bv "monadic_app_var" None t' in
                 let body = letbind_on_lift es ((S.bv_to_name x, q)::acc) in
                 let lb = Util.mk_letbinding (Inl x) [] t' m e in
-                mk (Tm_let ((false, [lb]), SS.close [S.mk_binder x] body)) None e.pos
+                let letbinding = mk (Tm_let ((false, [lb]), SS.close [S.mk_binder x] body)) None e.pos in
+                mk (Tm_meta(letbinding, Meta_monadic(m, comp.res_typ))) None e.pos
               in
               begin match (SS.compress e).n with
               | Tm_meta (e0, Meta_monadic(m, t'))

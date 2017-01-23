@@ -2219,7 +2219,7 @@ end
 body
 end)
 in (let _154_914 = (FStar_List.tl stack)
-in (norm cfg env _154_914 head))))
+in (norm cfg env _154_914 body))))
 end)))
 end)))
 end

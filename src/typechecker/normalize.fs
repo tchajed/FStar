@@ -975,13 +975,14 @@ let rec norm : cfg -> env -> stack -> term -> term =
                                 let _, bind_repr = ed.bind_repr in
                                 begin match lb.lbname with
                                     | Inl x ->
+                                        (* TODO : optimize away bind-return pairs if possible *)
                                         let head = U.mk_reify <| lb.lbdef in
                                         let body = U.mk_reify <| body in
                                         let body = S.mk (Tm_abs([S.mk_binder x], body, None)) None body.pos in
                                         let bind_inst = match (SS.compress bind_repr).n with
                                             | Tm_uinst (bind, [_ ; _]) ->
                                                 S.mk (Tm_uinst (bind, [ cfg.tcenv.universe_of cfg.tcenv lb.lbtyp
-                                                                        ; cfg.tcenv.universe_of cfg.tcenv t]))
+                                                                      ; cfg.tcenv.universe_of cfg.tcenv t]))
                                                 None t.pos
                                             | _ -> failwith "NIY : Reification of indexed effects"
                                         in
@@ -1041,7 +1042,7 @@ let rec norm : cfg -> env -> stack -> term -> term =
                                         S.mk (Tm_meta (body, Meta_monadic(m, t))) None t.pos
                                     | Some true -> body
                                 in
-                                norm cfg env (List.tl stack) head
+                                norm cfg env (List.tl stack) body
                             | Tm_meta(e, Meta_monadic_lift (msrc, mtgt, t')) ->
                                 let lifted = reify_lift cfg.tcenv e msrc mtgt t' in
                                 norm cfg env stack lifted
