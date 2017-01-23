@@ -47,6 +47,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ProjectReference Include="..\basic\basic.fsproj">
       <Name>basic</Name>
       <Project>{e8957dbd-58e7-4cf8-9192-e0a9cfb3867e}</Project>
@@ -68,6 +69,22 @@
     <Compile Include="print.fs" />
     <Compile Include="mutrecty.fsi" />
     <Compile Include="mutrecty.fs" />
+=======
+    <Compile Include="FStar.Syntax.Syntax.fsi" />
+    <Compile Include="FStar.Syntax.Syntax.fs" />
+    <Compile Include="FStar.Syntax.Const.fs" />
+    <Compile Include="FStar.Syntax.Subst.fsi" />
+    <Compile Include="FStar.Syntax.Subst.fs" />
+    <Compile Include="FStar.Syntax.Free.fsi" />
+    <Compile Include="FStar.Syntax.Free.fs" />
+    <Compile Include="FStar.Syntax.InstFV.fsi" />
+    <Compile Include="FStar.Syntax.InstFV.fs" />
+    <Compile Include="FStar.Syntax.Util.fs" />
+    <Compile Include="FStar.Syntax.Print.fsi" />
+    <Compile Include="FStar.Syntax.Print.fs" />
+    <Compile Include="FStar.Syntax.MutRecTy.fsi" />
+    <Compile Include="FStar.Syntax.MutRecTy.fs" />
+>>>>>>> master
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Choose>
