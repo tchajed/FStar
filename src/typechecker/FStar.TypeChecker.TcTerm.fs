@@ -998,8 +998,9 @@ and check_application_args env head chead ghead args expected_topt : term * lcom
                     U.is_pure_or_ghost_lcomp cres
                     && arg_comps_rev |> BU.for_some (function
                         | (_, _, Inl _) -> false
-                        | (_, _, Inr c) -> not (U.is_pure_or_ghost_lcomp c)) in
+                        | (_, _, Inr c) -> not (U.is_pure_or_ghost_lcomp c))
                     (* if the guard is trivial, then strengthen_precondition below will not add an equality; so add it here *)
+                in
 
                 let cres = //NS: Choosing when to add an equality refinement is VERY important for performance.
                             //Adding it unconditionally impacts run time by >5x
@@ -1035,7 +1036,7 @@ and check_application_args env head chead ghead args expected_topt : term * lcom
                               c (x, out_c) in
               (* TODO (KM) : Why would we need both a lift and a monadic tag ? *)
               let e = TcUtil.maybe_lift env e c.eff_name out_c.eff_name c.res_typ in
-              let e = TcUtil.maybe_monadic env e c.eff_name c.res_typ in
+              (* let e = TcUtil.maybe_monadic env e c.eff_name c.res_typ in *)
               (e, q)::args, out_c, monadic)
             ([], cres, false)
             arg_comps_rev
