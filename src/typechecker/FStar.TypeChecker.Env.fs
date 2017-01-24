@@ -1000,3 +1000,5 @@ let dummy_solver = {
     refresh=(fun () -> ());
 }
 (* </Move> *)
+
+let print_proof_state (e: env) t = FStar.Util.print1 "%s\n" (FStar.Syntax.Print.term_to_string t)

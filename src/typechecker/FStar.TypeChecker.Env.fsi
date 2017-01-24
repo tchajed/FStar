@@ -178,3 +178,5 @@ val wp_signature    : env -> lident -> (bv * term)
 
 (* A coercion *)
 val binders_of_bindings : list<binding> -> binders
+
+val print_proof_state : env -> typ -> unit

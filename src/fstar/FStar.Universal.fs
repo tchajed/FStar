@@ -69,6 +69,7 @@ let tc_prims () : (Syntax.modul * int)
                   * DsEnv.env
                   * TcEnv.env =
   let solver = if Options.lax() then SMT.dummy else SMT.solver in
+  let solver = {solver with solve = fun x e t -> (TcEnv.print_proof_state e t ; solver.solve x e t)} in
   let env = TcEnv.initial_env TcTerm.type_of_tot_term TcTerm.universe_of solver Const.prims_lid in
   env.solver.init env;
   let prims_filename = Options.prims () in
