@@ -13,6 +13,7 @@ module Crypto.KrmlTest
 
 *)
 
+open FStar.ST
 open FStar.UInt32
 open FStar.Ghost
 open FStar.Buffer

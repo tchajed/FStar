@@ -1,4 +1,5 @@
 module Platform.Date
+open FStar.ST
 
 assume new type dateTime : Type0
 assume new type timeSpan : Type0
