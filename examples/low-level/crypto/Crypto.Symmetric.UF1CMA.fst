@@ -7,6 +7,7 @@ module Crypto.Symmetric.UF1CMA
 
 open FStar.HyperHeap
 open FStar.HyperStack
+open FStar.ST
 open FStar.Ghost
 open FStar.UInt64
 open FStar.Buffer

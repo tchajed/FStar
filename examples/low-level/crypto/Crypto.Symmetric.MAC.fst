@@ -9,6 +9,8 @@
 *)
 module Crypto.Symmetric.MAC
 
+open FStar.ST
+
 open Crypto.Symmetric.Bytes
 open Crypto.Indexing
 open Flag

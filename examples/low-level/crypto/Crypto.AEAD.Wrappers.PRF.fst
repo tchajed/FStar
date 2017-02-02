@@ -1,6 +1,7 @@
 module Crypto.AEAD.Wrappers.PRF
 open FStar.UInt32
 open FStar.HyperStack
+open FStar.ST
 open FStar.Monotonic.RRef
 
 open Crypto.Indexing

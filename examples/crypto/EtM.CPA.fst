@@ -4,6 +4,7 @@ open FStar.Seq
 open FStar.Monotonic.Seq
 open FStar.HyperHeap
 open FStar.HyperStack
+open FStar.ST
 open FStar.Monotonic.RRef
 open EtM.Ideal
 

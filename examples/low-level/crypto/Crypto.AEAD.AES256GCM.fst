@@ -3,6 +3,7 @@ module Crypto.AEAD.AES256GCM
 open FStar.Mul
 open FStar.Ghost
 open FStar.HyperStack
+open FStar.ST
 open FStar.UInt8
 open FStar.Buffer
 open FStar.Int.Cast

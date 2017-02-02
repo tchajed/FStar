@@ -1,4 +1,5 @@
 module Crypto.AEAD.Wrappers.CMA
+open FStar.ST
 open FStar.UInt32
 open FStar.Ghost
 open Buffer.Utils

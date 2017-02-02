@@ -3,6 +3,7 @@ module FStar.Buffer
 open FStar.Seq
 open FStar.UInt32
 open FStar.HyperStack
+open FStar.ST
 open FStar.Ghost
 
 module HH = FStar.HyperHeap

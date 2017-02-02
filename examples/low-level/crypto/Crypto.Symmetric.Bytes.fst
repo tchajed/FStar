@@ -2,6 +2,7 @@ module Crypto.Symmetric.Bytes
 
 open FStar.HyperHeap
 open FStar.HyperStack
+open FStar.ST
 open FStar.UInt32
 open FStar.Ghost
 open FStar.Buffer

@@ -6,6 +6,7 @@ open FStar.Ghost
 open FStar.UInt64
 (** Effects and memory layout *)
 open FStar.HyperStack
+open FStar.ST
 (** Buffers *)
 open FStar.Buffer
 (** Mathematical definitions *)

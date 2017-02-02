@@ -1,4 +1,5 @@
 module Crypto.AEAD.Wrappers.Encoding 
+open FStar.ST
 
 // This file defines the encoding of additional data and ciphertext
 // authenticated by the one-time MACs, and their injectivity properties. 

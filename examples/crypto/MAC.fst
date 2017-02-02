@@ -21,6 +21,7 @@
 module MAC
 //open Array
 open SHA1
+open FStar.All
 open FStar.IO
 
 (* ---- specification *)

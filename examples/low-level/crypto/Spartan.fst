@@ -1,4 +1,5 @@
 module Spartan
+open FStar.ST
 
 open FStar.Buffer
 type u8=FStar.UInt8.t

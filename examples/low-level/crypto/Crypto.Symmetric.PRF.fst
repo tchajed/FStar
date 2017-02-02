@@ -1,4 +1,5 @@
 module Crypto.Symmetric.PRF
+open FStar.ST
 
 (* This file models our idealization of symmetric ciphers used only in
    forward mode, including CHACHA20 and several variants of AES for

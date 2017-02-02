@@ -2,6 +2,7 @@ module TestMonotonic
 
 open FStar.HyperHeap
 open FStar.HyperStack
+open FStar.ST
 open FStar.Monotonic.RRef
 
 type t = option bool

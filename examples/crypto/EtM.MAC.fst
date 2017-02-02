@@ -1,4 +1,5 @@
 module EtM.MAC
+open FStar.ST
 
 open FStar.Seq
 open FStar.Monotonic.Seq

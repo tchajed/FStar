@@ -1,4 +1,6 @@
 module Crypto.AEAD.Invariant
+open FStar.ST
+
 // We implement ideal AEAD on top of ideal Chacha20 and ideal Poly1305. 
 // We precisely relate AEAD's log to their underlying state.
 

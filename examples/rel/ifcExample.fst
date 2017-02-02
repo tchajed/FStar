@@ -1,4 +1,5 @@
 module IfcExample
+open FStar.ST
 
 open Rel
 open WhileLanguage

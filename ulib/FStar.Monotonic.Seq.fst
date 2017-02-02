@@ -1,5 +1,6 @@
 module FStar.Monotonic.Seq
 
+open FStar.ST
 open FStar.Seq
 open FStar.Classical
 module HH   = FStar.HyperHeap

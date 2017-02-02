@@ -10,6 +10,7 @@ module Crypto.Symmetric.AES
 open FStar.Mul
 open FStar.Ghost
 open FStar.HyperStack
+open FStar.ST
 open FStar.UInt8
 open FStar.Int.Cast
 open FStar.Buffer

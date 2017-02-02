@@ -14,7 +14,7 @@
    limitations under the License.
 *)
 module FStar.All
-open FStar.ST
+include FStar.ST
 
 let all_pre = all_pre_h HyperHeap.t
 let all_post (a:Type) = all_post_h HyperHeap.t a
