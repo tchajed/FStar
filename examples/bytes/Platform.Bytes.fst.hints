@@ -1440,7 +1440,8 @@
         "typing_Platform.Bytes.__proj__Mkproto_bytes__item__length",
         "typing_Platform.Bytes.__proj__Mkproto_bytes__item__max",
         "typing_Platform.Bytes.get_cbytes",
-        "typing_Platform.Bytes.get_cbytes_"
+        "typing_Platform.Bytes.get_cbytes_",
+        "typing_Platform.Bytes.sum_length"
       ],
       0
     ],
@@ -1806,8 +1807,9 @@
         "equation_with_fuel_Platform.Bytes.concatT_empty.fuel_instrumented",
         "fuel_correspondence_Platform.Bytes.concatT_empty.fuel_instrumented",
         "fuel_correspondence_Platform.Bytes.getBytes.fuel_instrumented",
-        "fuel_guarded_inversion_Platform.Bytes.proto_bytes", "int_inversion",
-        "lemma_Platform.Bytes.append_empty",
+        "fuel_guarded_inversion_Platform.Bytes.proto_bytes",
+        "fuel_irrelevance_Platform.Bytes.concatT_empty.fuel_instrumented",
+        "int_inversion", "lemma_Platform.Bytes.append_empty",
         "lemma_Platform.Bytes.get_cbytes__ok",
         "lemma_Platform.Bytes.lemma_getBytes",
         "lemma_Platform.Bytes.lemma_getBytes_2",
