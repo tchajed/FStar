@@ -1,0 +1,20 @@
+#push 1 0
+module Test
+#end #done-ok #done-nok
+#push 1 11
+
+let x = 1
+#end #done-ok #done-nok
+#push 1 11
+
+let f x y =
+  assert (pred x);
+  assert (x <> y)
+#end #done-ok #done-nok#push 1 11
+
+val g: x:int -> y:int{ y <> x } -> unit
+let g x y = assert (x <> y)
+
+let test =
+  assert (x >= 0)
+#end #done-ok #done-nok
