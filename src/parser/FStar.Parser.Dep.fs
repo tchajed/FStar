@@ -223,7 +223,7 @@ let collect_one
         let r = enter_namespace original_map working_map key in
         if not r then begin
           if let_open then
-            raise (Err ("let-open only supported for modules, not namespaces"))
+            raise (Err ("let-open only supported for modules, not namespaces\n"))
           else
             Util.fprint stderr "Warning: no modules in namespace %s and no file with \
               that name either\n" [string_of_lid lid true]
@@ -347,7 +347,7 @@ let collect_one
         incr num_of_toplevelmods;
         if (!num_of_toplevelmods > 1) then
             raise (Err (Util.format1 "Automatic dependency analysis demands one \
-              module per file (module %s not supported)" (string_of_lid lid true)))
+              module per file (module %s not supported)\n" (string_of_lid lid true)))
 
   and collect_tycon = function
     | TyconAbstract (_, binders, k) ->
