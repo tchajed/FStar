@@ -25,7 +25,7 @@ open FStar.All
 open FStar.ST
 open FStar.Seq
 open FStar.Heap
-(* abstract *) type array (t:Type) = ref (seq t)
+abstract type array (t:Type) = ref (seq t)
 
 abstract val op_At_Bar: #a:Type -> s1:array a -> s2:array a -> ST (array a)
   (requires (fun h -> contains h s1 /\ contains h s2))
