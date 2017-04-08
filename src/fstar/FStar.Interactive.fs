@@ -57,6 +57,7 @@ let tc_prims () = //:uenv =
 type env_t = DsEnv.env * TcEnv.env
 type modul_t = option<Syntax.Syntax.modul>
 type stack_t = list<(env_t * modul_t)>
+type push_kind = | PushFull | PushLax | PushSyntaxCheck | PushLightCheck
 
 // Note: many of these functions are passing env around just for the sake of
 // providing a link to the solver (to avoid a cross-project dependency). They're
@@ -67,8 +68,23 @@ let pop (_, env) msg =
     pop_context env msg;
     Options.pop()
 
-let push ((dsenv: DsEnv.env), env) lax restore_cmd_line_options msg =
-    let env = { env with lax = lax } in
+let cleanup (dsenv, env) = TcEnv.cleanup_interactive env
+
+let do_pop env stack ts msg =
+    pop env msg;
+    let (env, curmod), stack =
+      match stack with
+      | [] -> Util.print_error "too many pops"; exit 1
+      | hd::tl -> hd, tl
+    in
+    //all the fragments from the current buffer have been popped, call cleanup
+    let _ = if List.length stack = List.length ts then cleanup env else () in
+    env, stack, curmod
+
+let push ((dsenv: DsEnv.env), env) kind restore_cmd_line_options msg =
+    let env = { env with lax = kind <> PushFull } in
+    let dsenv = { dsenv with auto_pop = kind <> PushFull;
+                             syntax_check_only = (kind = PushSyntaxCheck) } in
     let res = push_context (dsenv, env) msg in
     Options.push();
     if restore_cmd_line_options then Options.restore_cmd_line_options false |> ignore;
@@ -85,8 +101,6 @@ let reset_mark (_, env) =
     let env = TcEnv.reset_mark env in
     Options.pop();
     dsenv, env
-
-let cleanup (dsenv, env) = TcEnv.cleanup_interactive env
 
 let commit_mark (dsenv, env) =
     let dsenv = DsEnv.commit_mark dsenv in
@@ -120,8 +134,9 @@ let report_fail () =
 (****************************************************************************************)
 (* Internal data structures for managing chunks of input from the editor                *)
 (****************************************************************************************)
+
 type input_chunks =
-  | Push of bool * int * int //the bool flag indicates lax flag set from the editor
+  | Push of push_kind * int * int
   | Pop  of string
   | Code of string * (string * string)
   | Info of string * bool * option<(string * int * int)>
@@ -196,11 +211,11 @@ let rec read_chunk () =
         Util.clear_string_builder s.chunk;
         let lc_lax = Util.trim_string (Util.substring_from l (String.length "#push")) in
         let lc = match Util.split lc_lax " " with
-            | [l; c; "#lax"] -> true, Util.int_of_string l, Util.int_of_string c
-            | [l; c]         -> false, Util.int_of_string l, Util.int_of_string c
-            | _              ->
-              Util.print_warning ("Error locations may be wrong, unrecognized string after #push: " ^ lc_lax);
-              false, 1, 0
+            | [l; c; "#lax"]    -> PushLax, Util.int_of_string l, Util.int_of_string c
+            | [l; c; "#syntax"] -> PushSyntaxCheck, Util.int_of_string l, Util.int_of_string c
+            | [l; c; "#light"]  -> PushLightCheck, Util.int_of_string l, Util.int_of_string c
+            | [l; c]            -> PushFull, Util.int_of_string l, Util.int_of_string c
+            | _                 -> Util.print_error ("Unrecognized \"#push\" request: " ^ l); exit 1
         in
         Push lc)
   else if Util.starts_with l "#info " then
@@ -289,7 +304,7 @@ let rec tc_deps (m:modul_t) (stack:stack_t)
     | _  ->
       let stack = (env, m)::stack in
       //setting the restore command line options flag true
-      let env = push env (Options.lax ()) true "typecheck_modul" in
+      let env = push env (if Options.lax () then PushLax else PushFull) true "typecheck_modul" in
       let (intf, impl), env, modl, remaining = tc_one_file remaining env in
       let intf_t, impl_t =
         let intf_t =
@@ -529,17 +544,10 @@ let rec go (line_col:(int*int))
     go line_col filename stack curmod env ts
   | Pop msg ->
       // This shrinks all internal stacks by 1
-      pop env msg;
-      let (env, curmod), stack =
-        match stack with
-        | [] -> Util.print_error "too many pops"; exit 1
-        | hd::tl -> hd, tl
-      in
-      //all the fragments from the current buffer have been popped, call cleanup
-      let _ = if List.length stack = List.length ts then cleanup env else () in
+      let env, stack, curmod = do_pop env stack ts msg in
       go line_col filename stack curmod env ts
 
-  | Push (lax, l, c) ->
+  | Push (kind, l, c) ->
       // This grows all internal stacks by 1
       //if we are at a stage where we have not yet pushed a fragment from the current buffer, see if some dependency is stale
       //if so, update it
@@ -548,10 +556,15 @@ let rec go (line_col:(int*int))
         if List.length stack = List.length ts then true, update_deps filename curmod stack env ts else false, (stack, env, ts)
       in
       let stack = (env, curmod)::stack in
-      let env = push env lax restore_cmd_line_options "#push" in
+      let env = push env kind restore_cmd_line_options "#push" in
       go (l, c) filename stack curmod env ts
 
   | Code (text, (ok, fail)) ->
+      let maybe_auto_pop env stack curmod =
+          let dsenv : DsEnv.env = (fst env) in
+          if dsenv.auto_pop
+          then do_pop env stack ts "" // Automatically pop when using #light
+          else env, stack, curmod in
       // This does not grow any of the internal stacks.
       let fail curmod env_mark =
         report_fail();
@@ -560,6 +573,7 @@ let rec go (line_col:(int*int))
         // At this stage, the internal stack has grown with size 1. BUT! The
         // interactive mode will send us a pop message.
         let env = reset_mark env_mark in
+        let env, stack, curmod = maybe_auto_pop env stack curmod in
         go line_col filename stack curmod env ts
       in
 
@@ -578,7 +592,8 @@ let rec go (line_col:(int*int))
               Util.print1 "\n%s\n" ok;
               // Side-effect: pops from an internal, hidden stack
               // At this stage, the internal stack has grown with size 1.
-              let env = commit_mark env in
+              let env = commit_mark env in // FIXME what is this commit for?
+              let env, stack, curmod = maybe_auto_pop env stack curmod in
               go line_col filename stack curmod env ts
               end
             else fail curmod env_mark

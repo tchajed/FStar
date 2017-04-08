@@ -93,6 +93,8 @@ type env = {
   admitted_iface:       bool;                             (* is it an admitted interface; different scoping rules apply *)
   expect_typ:           bool;                             (* syntactically, expect a type at this position in the term *)
   docs:                 BU.smap<Parser.AST.fsdoc>;        (* Docstrings of lids *)
+  syntax_check_only:    bool;                             (* Next check is only a syntax check *)
+  auto_pop:             bool;                             (* Whether next check should be immediately popped after completing *)
 }
 
 type foundname =
@@ -129,7 +131,9 @@ let empty_env () = {curmodule=None;
                     iface=false;
                     admitted_iface=false;
                     expect_typ=false;
-                    docs=new_sigmap()}
+                    docs=new_sigmap();
+                    syntax_check_only=false;
+                    auto_pop=false}
 let sigmap env = env.sigmap
 let has_all_in_scope env =
   List.existsb (fun (m, _) ->

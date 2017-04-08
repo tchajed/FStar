@@ -92,6 +92,8 @@ type env = {
   admitted_iface:       bool;                             (* is it an admitted interface; different scoping rules apply *)
   expect_typ:           bool;                             (* syntactically, expect a type at this position in the term *)
   docs:                 BU.smap<Parser.AST.fsdoc>;        (* Docstrings of lids *)
+  syntax_check_only:    bool;                             (* Next check is only a syntax check *)
+  auto_pop:             bool;                             (* Whether next check should be immediately popped after completing *)
 }
 
 type foundname =
