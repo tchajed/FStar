@@ -99,7 +99,7 @@ let go _ =
         then Parser.Dep.print (Parser.Dep.collect Parser.Dep.VerifyAll filenames)
         else if Options.interactive () then begin //--in
           if Options.explicit_deps () then begin
-            Util.print_error "--explicit_deps incompatible with --in|n";
+            Util.print_error "--explicit_deps incompatible with --in\n";
             exit 1
           end;
           if List.length filenames <> 1 then begin
@@ -155,7 +155,7 @@ let main () =
     exit 0
   with | e ->
     (begin
-        if FStar.Errors.handleable e then FStar.Errors.handle_err false e;
+        if FStar.Errors.handleable e then FStar.Errors.err_exn e;
         if (Options.trace_error()) then
           Util.print2_error "Unexpected error\n%s\n%s\n" (Util.message_of_exn e) (Util.trace_of_exn e)
         else if not (FStar.Errors.handleable e) then
